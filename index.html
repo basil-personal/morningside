@@ -4,123 +4,114 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Basil Alomary – Principal and Head of Research &amp; Growth Strategy</title>
-  <!-- Using Merriweather for a classic serif look -->
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- Import fonts: Playfair Display for headings, Lato for body -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-    /* Reset basic elements */
+    /* Reset */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    /* Cream background with a subtle paper texture */
+    /* Background: a subtle soft gradient for an elegant, modern feel */
     body {
-      font-family: 'Merriweather', serif;
-      font-size: 15px; /* slightly smaller base font */
-      line-height: 1.6;
+      font-family: 'Lato', sans-serif;
+      background: linear-gradient(135deg, #fbf8f2, #ffffff);
       color: #333;
-      background: #fdf6e3 url("https://www.transparenttextures.com/patterns/paper-1.png");
-      background-attachment: fixed;
-      -webkit-font-smoothing: antialiased;
-    }
-    /* Header styling – left aligned */
-    header {
-      padding: 40px 20px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-    header h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-    header p {
-      font-size: 1rem;
-      color: #666;
-      margin-bottom: 0;
+      font-size: 16px;
+      line-height: 1.6;
     }
     /* Main container */
     .container {
-      max-width: 800px;
-      margin: 60px auto;
+      max-width: 900px;
+      margin: 80px auto;
       padding: 0 20px;
+    }
+    /* Header styling */
+    header {
+      margin-bottom: 60px;
       text-align: left;
     }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    header p {
+      font-size: 1.1rem;
+      color: #7f8c8d;
+    }
+    /* Section styling */
     section {
       margin-bottom: 60px;
+      text-align: left;
     }
     section h2 {
-      font-size: 1.6rem;
-      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #2c3e50;
       margin-bottom: 20px;
-      border-bottom: 2px solid #ddd;
       padding-bottom: 10px;
+      border-bottom: 2px solid #ecf0f1;
     }
-    .bio p {
+    .bio p,
+    .writing li,
+    .connect p {
       margin-bottom: 20px;
-      font-size: 0.95rem;
-      color: #444;
-      line-height: 1.7;
+      color: #4d4d4d;
     }
-    .bio a {
-      color: #0070f3;
+    /* Link styling */
+    a {
+      color: #2c3e50;
       text-decoration: none;
       border-bottom: 1px solid transparent;
-      transition: border-bottom 0.2s;
+      transition: border-color 0.2s ease;
     }
-    .bio a:hover {
-      border-bottom: 1px solid #0070f3;
+    a:hover {
+      border-color: #2c3e50;
     }
+    /* Writing list */
     .writing ul {
       list-style: none;
       padding-left: 0;
     }
-    .writing ul li {
+    .writing li {
       margin-bottom: 12px;
-      font-size: 0.95rem;
+      font-size: 1rem;
     }
-    .writing a {
-      text-decoration: none;
-      color: #0070f3;
-      transition: color 0.2s;
-    }
-    .writing a:hover {
-      color: #005bb5;
-    }
+    /* Connect section */
     .connect a {
-      text-decoration: none;
-      color: #0070f3;
       font-size: 1rem;
       margin-right: 30px;
-      transition: color 0.2s;
     }
-    .connect a:hover {
-      color: #005bb5;
-    }
+    /* Footer styling */
     footer {
+      padding: 20px 0;
+      border-top: 1px solid #ecf0f1;
+      color: #95a5a6;
+      font-size: 0.9rem;
       text-align: left;
-      padding: 20px;
-      font-size: 0.85rem;
-      color: #888;
-      border-top: 1px solid #eee;
     }
     /* Responsive adjustments */
     @media (max-width: 600px) {
       header h1 {
-        font-size: 1.8rem;
+        font-size: 2.2rem;
       }
       section h2 {
-        font-size: 1.3rem;
+        font-size: 1.6rem;
       }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Basil Alomary</h1>
-    <p>Principal and Head of Research &amp; Growth Strategy at <a href="https://www.stripes.co" target="_blank" style="color: inherit; text-decoration: none;">Stripes</a></p>
-  </header>
   <div class="container">
+    <header>
+      <h1>Basil Alomary</h1>
+      <p>Principal and Head of Research &amp; Growth Strategy at <a href="https://www.stripes.co" target="_blank">Stripes</a></p>
+    </header>
+    
     <section class="bio">
       <h2>About Me</h2>
       <p>
@@ -136,6 +127,7 @@
         I am a graduate of <a href="https://www8.gsb.columbia.edu" target="_blank">Columbia Business School</a> and was a Second Year Fellow and the recipient of the Glenn Hubbard Scholarship. During my time at Columbia, I was a VC Fellow with <a href="https://www.generalcatalyst.com" target="_blank">General Catalyst</a>, an MBA Associate at <a href="https://primary.vc" target="_blank">Primary Venture Partners</a>, a Student Fellow at <a href="https://406ventures.com" target="_blank">.406 Ventures</a>, a Venture Partner at <a href="https://www.contrarycap.com" target="_blank">Contrary Capital</a>, and an InSITE Fellow.
       </p>
     </section>
+    
     <section class="writing">
       <h2>Writing</h2>
       <ul>
@@ -146,14 +138,18 @@
         <li><a href="https://medium.com" target="_blank">The Future of InsurTech: Why serving policyholders has been the path to growth for so many...</a></li>
       </ul>
     </section>
+    
     <section class="connect">
       <h2>Connect</h2>
-      <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
-      <a href="https://twitter.com" target="_blank">Twitter</a>
+      <p>
+        <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
+        <a href="https://twitter.com" target="_blank">Twitter</a>
+      </p>
     </section>
+    
+    <footer>
+      &copy; 2025 Basil Alomary. All rights reserved.
+    </footer>
   </div>
-  <footer>
-    &copy; 2025 Basil Alomary. All rights reserved.
-  </footer>
 </body>
 </html>
