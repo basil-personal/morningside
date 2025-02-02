@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BASIL ALOMARY</title>
 
-  <!-- Favicon: An inline SVG with the letter B in IBM Plex Mono -->
+  <!-- Favicon: "B" in IBM Plex Mono as inline SVG -->
   <link rel="icon" type="image/svg+xml" 
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' fill='%23FFF' /%3E%3Ctext x='3' y='13' font-family='IBM Plex Mono' font-size='12' fill='%23000'%3EB%3C/text%3E%3C/svg%3E" />
 
-  <!-- IBM Plex Mono -->
+  <!-- Google Font: IBM Plex Mono -->
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
 
   <style>
@@ -20,110 +20,109 @@
       box-sizing: border-box;
     }
 
-    /* BODY */
+    /* BODY - center content vertically & horizontally */
     body {
       background: #000;
       color: #fff;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 10px; /* very small base font */
-      line-height: 1.4;
-      height: 100vh;
-      overflow: hidden; /* hide scroll during loading */
+      font-size: 10px;      /* small base font */
+      line-height: 1.2;     /* tight line-height */
+      height: 100vh; 
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow: hidden;     /* hide scroll until loader completes */
+    }
+
+    /* CONTAINER - narrow width, so text sits in the center with wide side margins */
+    .container {
+      width: 350px;         /* adjust if you want it narrower or wider */
+      text-align: center;
     }
 
     /* LOADER OVERLAY */
     .loader-overlay {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      inset: 0;
       background: #000;
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 999;
     }
-
-    /* LOADING BAR */
     .loading-bar {
       position: relative;
-      width: 200px;
+      width: 120px;
       height: 2px;
       background: rgba(255, 255, 255, 0.2);
-      overflow: hidden;
     }
     .loading-fill {
       position: absolute;
-      left: 0; top: 0;
-      height: 100%;
+      left: 0; 
+      top: 0;
       width: 0%;
+      height: 100%;
       background: #fff;
-      animation: loadAnim 3s linear forwards;
+      animation: loadAnim 2.4s linear forwards;
     }
     @keyframes loadAnim {
       0%   { width: 0%; }
       100% { width: 100%; }
     }
 
-    /* MAIN CONTENT (hidden until loader finishes) */
+    /* MAIN CONTENT (hidden until loader completes) */
     .main-content {
-      text-align: center;
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
+      transform: translateY(10px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
     }
     .main-content.show {
       opacity: 1;
       transform: translateY(0);
     }
 
-    /* NAME & TITLE */
+    /* NAME at top, uppercase, slightly bigger but still tight */
     .name {
-      font-size: 2rem;
-      margin-bottom: 6px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-    }
-    .title-line {
-      font-size: 1rem;
-      margin-bottom: 20px;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
     }
 
     /* SECTIONS WRAPPER */
     .sections {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 6px; /* tight spacing between sections */
     }
     .section-header {
       cursor: pointer;
-      font-weight: bold;
-      letter-spacing: 2px;
       text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
       transition: color 0.2s ease;
+      margin-top: 8px;
     }
     .section-header:hover {
       color: #ccc;
     }
 
-    /* COLLAPSIBLE CONTENT */
+    /* COLLAPSIBLE CONTENT - tight transitions */
     .section-content {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.4s ease, opacity 0.4s ease;
       opacity: 0;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
     }
     .section-content.open {
       opacity: 1;
-      padding: 10px 0;
-      max-height: 500px; /* set higher if your content grows */
+      max-height: 300px; /* adjust if you have more content */
     }
+
+    /* TIGHT PARAGRAPHS */
     .section-content p {
       font-size: 0.9rem;
-      margin-bottom: 8px;
-      line-height: 1.4;
+      margin: 4px 0;
+      line-height: 1.2;
     }
 
     /* LINK STYLING */
@@ -148,134 +147,126 @@
   </div>
 
   <!-- MAIN CONTENT -->
-  <div class="main-content" id="mainContent">
-    <div class="name">BASIL ALOMARY</div>
-    <div class="title-line">Principal, Head of Research &amp; Growth Strategy at <a href="https://www.stripes.co" target="_blank">Stripes</a></div>
+  <div class="container">
+    <div class="main-content" id="mainContent">
+      
+      <!-- NAME ONLY -->
+      <div class="name">BASIL ALOMARY</div>
 
-    <div class="sections">
-      <!-- ABOUT -->
-      <div class="section">
-        <div class="section-header">About</div>
-        <div class="section-content">
-          <p>
-            I’m the Principal and Head of Research &amp; Growth Strategy at <a href="https://www.stripes.co" target="_blank">Stripes</a>,
-            building the diligence and investment research team to enable investments
-            in incredible software and consumer companies.
-          </p>
-          <p>
-            Previously, I was a Consultant at the New York office of 
-            <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> 
-            within the Private Equity Group (PEG), performing commercial due diligence 
-            on SaaS and fintech assets for VC, Growth Equity, and Crossover clients.
-          </p>
-          <p>
-            Prior to that, I served as the Head of Growth at 
-            <a href="https://simondata.com" target="_blank">Simon Data</a>, an enterprise 
-            customer data platform, from Seed to Series C. Additionally, I’ve been an independent 
-            investor, consultant, and advisor to several early-stage SaaS companies in NYC 
-            including <a href="https://www.cedar.com" target="_blank">Cedar Health</a>, 
-            <a href="https://www.klara.com" target="_blank">Klara</a>, 
-            <a href="https://www.go-maestro.com" target="_blank">Maestro</a>, 
-            <a href="https://www.eigentech.com" target="_blank">Eigen</a>, 
-            <a href="https://www.goethena.com" target="_blank">Ethena</a>, and others.
-          </p>
-          <p>
-            I am a graduate of 
-            <a href="https://www8.gsb.columbia.edu" target="_blank">Columbia Business School</a> 
-            and was a Second Year Fellow and the recipient of the Glenn Hubbard Scholarship. During my 
-            time at Columbia, I was a VC Fellow with 
-            <a href="https://www.generalcatalyst.com" target="_blank">General Catalyst</a>, 
-            an MBA Associate at <a href="https://primary.vc" target="_blank">Primary Venture Partners</a>, 
-            a Student Fellow at <a href="https://406ventures.com" target="_blank">.406 Ventures</a>, 
-            a Venture Partner at <a href="https://www.contrarycap.com" target="_blank">Contrary Capital</a>, 
-            and an InSITE Fellow.
-          </p>
+      <!-- COLLAPSIBLE SECTIONS -->
+      <div class="sections">
+        
+        <!-- ABOUT -->
+        <div class="section">
+          <div class="section-header">About</div>
+          <div class="section-content">
+            <p>
+              Principal, Head of Research &amp; Growth Strategy at 
+              <a href="https://www.stripes.co" target="_blank">Stripes</a>. Formerly at 
+              <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> (PEG) and 
+              <a href="https://www.simondata.com" target="_blank">Simon Data</a>.
+            </p>
+            <p>
+              Advised or invested in 
+              <a href="https://www.cedar.com" target="_blank">Cedar Health</a>, 
+              <a href="https://www.klara.com" target="_blank">Klara</a>, 
+              <a href="https://www.go-maestro.com" target="_blank">Maestro</a>, 
+              <a href="https://www.eigentech.com" target="_blank">Eigen</a>, 
+              <a href="https://www.goethena.com" target="_blank">Ethena</a>, and others.
+              MBA at 
+              <a href="https://www8.gsb.columbia.edu" target="_blank">Columbia Business School</a>.
+            </p>
+          </div>
         </div>
-      </div>
 
-      <!-- WRITING -->
-      <div class="section">
-        <div class="section-header">Writing</div>
-        <div class="section-content">
-          <p>
-            <a href="https://www.forbes.com" target="_blank">
-              “Why Investors Should Focus More On The Infrastructure Supporting The AI Revolution”
-            </a>
-          </p>
-          <p>
-            <a href="https://www.forbes.com" target="_blank">
-              “OK, Boomer: How An Aging Population Is Going To Impact Real Estate Technology”
-            </a>
-          </p>
-          <p>
-            <a href="https://medium.com" target="_blank">
-              “NFTs, like all art, are all about narrative”
-            </a>
-          </p>
-          <p>
-            <a href="https://wire.insiderfinance.io" target="_blank">
-              “Where am I going to display my NFT?”... and other stupid questions
-            </a>
-          </p>
-          <p>
-            <a href="https://medium.com" target="_blank">
-              “The Future of InsurTech: Why serving policyholders has been the path to growth for so many...”
-            </a>
-          </p>
+        <!-- WRITING -->
+        <div class="section">
+          <div class="section-header">Writing</div>
+          <div class="section-content">
+            <p>
+              <a href="https://www.forbes.com/sites/columbiabusinessschool/2020/10/04/why-investors-should-focus-more-on-the-infrastructure-supporting-the-ai-revolution/" 
+                 target="_blank">
+                Infrastructure Supporting the AI Revolution (Forbes)
+              </a>
+            </p>
+            <p>
+              <a href="https://www.forbes.com/sites/columbiabusinessschool/2020/04/30/ok-boomer-how-aging-population-impact-real-estate-tech/#21fc8cdc3241" 
+                 target="_blank">
+                OK, Boomer: Aging Population & Real Estate Tech (Forbes)
+              </a>
+            </p>
+            <p>
+              <a href="https://medium.com/@basil.a.alomary/nfts-like-all-art-are-all-about-narrative-bc0bb5edd81"
+                 target="_blank">
+                NFTs & the Power of Narrative (Medium)
+              </a>
+            </p>
+            <p>
+              <a href="https://wire.insiderfinance.io/where-am-i-going-to-display-my-nft-and-other-stupid-questions-acd868cd4f04"
+                 target="_blank">
+                Where am I going to display my NFT? (InsiderFinance)
+              </a>
+            </p>
+            <p>
+              <a href="https://medium.com/thoughts-from-primary-venture-partners/the-future-of-insurtech-why-serving-policyholders-has-been-the-path-to-growth-for-so-many-320b2c2b76b6"
+                 target="_blank">
+                The Future of InsurTech (Medium)
+              </a>
+            </p>
+          </div>
         </div>
-      </div>
 
-      <!-- CONTACT -->
-      <div class="section">
-        <div class="section-header">Contact</div>
-        <div class="section-content">
-          <p>
-            LinkedIn: 
-            <a href="https://www.linkedin.com/in/basilalomary" target="_blank">
-              linkedin.com/in/basilalomary
-            </a>
-          </p>
-          <p>
-            Twitter: 
-            <a href="https://twitter.com/basilalomary" target="_blank">
-              twitter.com/basilalomary
-            </a>
-          </p>
+        <!-- CONTACT -->
+        <div class="section">
+          <div class="section-header">Contact</div>
+          <div class="section-content">
+            <p>
+              LinkedIn: 
+              <a href="https://www.linkedin.com/in/basilalomary" target="_blank">
+                linkedin.com/in/basilalomary
+              </a>
+            </p>
+            <p>
+              Twitter: 
+              <a href="https://twitter.com/basil_alomary" target="_blank">
+                twitter.com/basil_alomary
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // 1) LOADER: Hide overlay after loading animation completes
+    // LOADER
     const loaderOverlay = document.querySelector('.loader-overlay');
     const loadingFill   = document.querySelector('.loading-fill');
     const mainContent   = document.getElementById('mainContent');
 
     loadingFill.addEventListener('animationend', () => {
-      loaderOverlay.style.transition = 'opacity 0.5s ease';
+      loaderOverlay.style.transition = 'opacity 0.3s ease';
       loaderOverlay.style.opacity = '0';
       setTimeout(() => {
         loaderOverlay.style.display = 'none';
         mainContent.classList.add('show');
-        document.body.style.overflow = 'auto'; // re-enable scrolling
-      }, 500);
+        document.body.style.overflow = 'auto'; // re-enable scrolling if needed
+      }, 300);
     });
 
-    // 2) COLLAPSIBLE SECTIONS (only one open at a time)
+    // ACCORDION (only one open at a time)
     const sectionHeaders = document.querySelectorAll('.section-header');
-    const allContents = document.querySelectorAll('.section-content');
+    const allContents    = document.querySelectorAll('.section-content');
 
     sectionHeaders.forEach(header => {
       header.addEventListener('click', () => {
-        // Close all sections first
+        // Close all other sections
         allContents.forEach(cnt => cnt.classList.remove('open'));
-        // Open the clicked section's content
+        // Open the clicked section
         const content = header.nextElementSibling;
         content.classList.add('open');
       });
     });
   </script>
-
 </body>
 </html>
