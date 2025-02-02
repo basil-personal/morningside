@@ -3,207 +3,205 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Basil Alomary – Head of Research & Growth Strategy</title>
-  
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <title>BASIL ALOMARY</title>
+
+  <!-- Import IBM Plex Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
 
   <style>
-    /* 
-      1) GLOBAL RESET
-    */
+    /* RESET */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    /* 
-      2) ANIMATED BACKGROUND 
-         - A slow, shifting gradient to add visual interest.
-    */
+    /* BODY - black background, white text, small mono font */
     body {
-      min-height: 100vh;
-      font-family: 'Lato', sans-serif;
-      color: #333;
-      
-      /* Animated gradient background */
-      background: linear-gradient(-45deg, #fffef6, #f9fefc, #fef8ff, #fffaf1);
-      background-size: 400% 400%;
-      animation: gradientBG 30s ease infinite;
+      background: #000;
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; /* super small base font */
+      line-height: 1.4;
+      height: 100vh; /* ensures full page height for center alignment */
+      overflow: hidden; /* hides scroll during loading */
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    @keyframes gradientBG {
-      0% {
-        background-position: 0% 50%;
-      }
-      50% {
-        background-position: 100% 50%;
-      }
-      100% {
-        background-position: 0% 50%;
-      }
+    /* LOADER OVERLAY */
+    .loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
     }
 
-    /* 
-      3) LAYOUT CONTAINER 
-         - Centered, max width for comfortable reading.
-    */
-    .container {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 40px 20px;
+    /* LOADING BAR (no text, just a small bar) */
+    .loading-bar {
+      position: relative;
+      width: 200px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+    }
+    .loading-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0%;
+      background: #fff;
+      animation: loadAnim 3s linear forwards;
+    }
+    @keyframes loadAnim {
+      0%   { width: 0%; }
+      100% { width: 100%; }
     }
 
-    /* 
-      4) HEADINGS & TEXT
-         - Larger, refined headings with Playfair Display.
-    */
-    h1, h2 {
-      font-family: 'Playfair Display', serif;
-      line-height: 1.2;
-      margin-bottom: 20px;
+    /* MAIN CONTENT - hidden until loaded */
+    .main-content {
       text-align: center;
-      color: #1a1a1a;
-    }
-    h1 {
-      font-size: 3rem;
-      margin-top: 40px;
-    }
-    h2 {
-      font-size: 2rem;
-      margin-bottom: 30px;
-    }
-    p, li {
-      font-size: 1rem;
-      margin-bottom: 20px;
-    }
-
-    /* 
-      5) LINKS 
-         - Underline appears on hover; color inherits from body text.
-    */
-    a {
-      color: inherit;
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-      transition: 0.2s border-color ease;
-    }
-    a:hover {
-      border-color: #000;
-    }
-
-    /* 
-      6) LISTS 
-         - No default bullets.
-    */
-    ul {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    /* 
-      7) SECTIONS 
-         - Fade-in animation triggered on load.
-    */
-    section {
       opacity: 0;
       transform: translateY(20px);
-      animation: fadeInUp 1s forwards ease-in-out;
-      margin-bottom: 60px;
+      transition: opacity 0.8s ease, transform 0.8s ease;
     }
-    /* Slightly stagger each section’s entry for a gentle cascade. */
-    section:nth-of-type(1) {
-      animation-delay: 0.2s;
-    }
-    section:nth-of-type(2) {
-      animation-delay: 0.4s;
-    }
-    section:nth-of-type(3) {
-      animation-delay: 0.6s;
-    }
-    section:nth-of-type(4) {
-      animation-delay: 0.8s;
+    .main-content.show {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    /* NAME */
+    .name {
+      font-size: 2rem; /* bigger than body for emphasis, still not huge */
+      margin-bottom: 10px;
+      letter-spacing: 3px;
     }
 
-    /*
-      8) FOOTER
-         - Centered, subtle text.
-    */
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      padding: 20px 0;
-      font-size: 0.9rem;
-      color: #666;
+    /* SECTIONS WRAPPER */
+    .sections {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    .section-header {
+      cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s ease;
+    }
+    .section-header:hover {
+      color: #ccc;
     }
 
-    /* 
-      9) RESPONSIVE
-    */
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2.2rem;
-      }
-      h2 {
-        font-size: 1.6rem;
-      }
+    /* COLLAPSIBLE CONTENT */
+    .section-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.4s ease;
+      opacity: 0;
     }
+    .section-content.open {
+      opacity: 1;
+      padding: 10px 0;
+      max-height: 200px; /* adjust if you have more content */
+    }
+
+    /* SMALLER TEXT FOR EXPANDED CONTENT */
+    .section-content p {
+      font-size: 0.9rem; /* slightly smaller than the base 10px for variety */
+      margin-bottom: 8px;
+    }
+
   </style>
 </head>
 <body>
-  <div class="container">
-    
-    <header>
-      <h1>Basil Alomary</h1>
-      <p>Head of Research &amp; Growth Strategy at <a href="https://www.stripes.co" target="_blank">Stripes</a></p>
-    </header>
 
-    <section class="bio">
-      <h2>About Me</h2>
-      <p>
-        I’m the Head of Research at <a href="https://www.stripes.co" target="_blank">Stripes</a>, building the diligence and investment research team to enable us to make investments in incredible software and consumer companies.
-      </p>
-      <p>
-        I was previously a Consultant at the New York office of <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> within the Private Equity Group (PEG) performing commercial due diligence on SaaS and fintech assets for VC, Growth Equity, and Crossover clients.
-      </p>
-      <p>
-        Prior to that, I served as the Head of Growth at <a href="https://simondata.com" target="_blank">Simon Data</a>, an enterprise customer data platform, from Seed to Series C. Additionally, I’ve served as an independent investor, consultant, and advisor to several early-stage SaaS companies in NYC including <a href="https://www.cedar.com" target="_blank">Cedar Health</a>, <a href="https://www.klara.com" target="_blank">Klara</a>, <a href="https://www.go-maestro.com" target="_blank">Maestro</a>, <a href="https://www.eigentech.com" target="_blank">Eigen</a>, <a href="https://www.goethena.com" target="_blank">Ethena</a>, and others.
-      </p>
-      <p>
-        I am a graduate of <a href="https://www8.gsb.columbia.edu" target="_blank">Columbia Business School</a> and was a Second Year Fellow and the recipient of the Glenn Hubbard Scholarship. During my time at Columbia, I was a VC Fellow with <a href="https://www.generalcatalyst.com" target="_blank">General Catalyst</a>, an MBA Associate at <a href="https://primary.vc" target="_blank">Primary Venture Partners</a>, a Student Fellow at <a href="https://406ventures.com" target="_blank">.406 Ventures</a>, a Venture Partner at <a href="https://www.contrarycap.com" target="_blank">Contrary Capital</a>, and an InSITE Fellow.
-      </p>
-    </section>
-    
-    <section class="writing">
-      <h2>Writing</h2>
-      <ul>
-        <li><a href="https://www.forbes.com" target="_blank">Why Investors Should Focus More On The Infrastructure Supporting The AI Revolution</a></li>
-        <li><a href="https://www.forbes.com" target="_blank">OK, Boomer: How An Aging Population Is Going To Impact Real Estate Technology</a></li>
-        <li><a href="https://medium.com" target="_blank">NFTs, like all art, are all about narrative</a></li>
-        <li><a href="https://wire.insiderfinance.io" target="_blank">“Where am I going to display my NFT?”... and other stupid questions</a></li>
-        <li><a href="https://medium.com" target="_blank">The Future of InsurTech: Why serving policyholders has been the path to growth for so many...</a></li>
-      </ul>
-    </section>
-    
-    <section class="connect">
-      <h2>Connect</h2>
-      <p>
-        <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
-        <a href="https://twitter.com" target="_blank">Twitter</a>
-      </p>
-    </section>
-    
-    <footer>
-      &copy; 2025 Basil Alomary. All rights reserved.
-    </footer>
+  <!-- LOADER OVERLAY -->
+  <div class="loader-overlay">
+    <div class="loading-bar">
+      <div class="loading-fill"></div>
+    </div>
   </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content" id="mainContent">
+    <div class="name">BASIL ALOMARY</div>
+    <div class="sections">
+      <!-- ABOUT -->
+      <div class="section">
+        <div class="section-header">About</div>
+        <div class="section-content">
+          <p>
+            Head of Research & Growth Strategy at Stripes. Former consultant in the Private Equity Group at Bain & Company.
+          </p>
+          <p>
+            Advised and invested in various early-stage SaaS companies in NYC. MBA from Columbia Business School.
+          </p>
+        </div>
+      </div>
+
+      <!-- WRITING -->
+      <div class="section">
+        <div class="section-header">Writing</div>
+        <div class="section-content">
+          <p>“Why Investors Should Focus More On The Infrastructure Supporting The AI Revolution” (Forbes)</p>
+          <p>“OK, Boomer: How An Aging Population Is Going To Impact Real Estate Technology” (Forbes)</p>
+          <p>“NFTs, like all art, are all about narrative” (Medium)</p>
+          <p>“Where am I going to display my NFT?” (InsiderFinance)</p>
+          <p>“The Future of InsurTech: Why serving policyholders has been the path to growth for so many...” (Medium)</p>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="section">
+        <div class="section-header">Contact</div>
+        <div class="section-content">
+          <p>LinkedIn: <a href="https://www.linkedin.com" target="_blank" style="color: #fff;">linkedin.com/in/basilalomary</a></p>
+          <p>Twitter: <a href="https://twitter.com" target="_blank" style="color: #fff;">twitter.com/basilalomary</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1) LOADER: Hide overlay after loading animation completes
+    // The loadAnim is 3s, so we can time it out or wait for "animationend" event.
+    const loaderOverlay = document.querySelector('.loader-overlay');
+    const loadingFill = document.querySelector('.loading-fill');
+    const mainContent = document.getElementById('mainContent');
+
+    // Listen for animationend on the loading-fill bar
+    loadingFill.addEventListener('animationend', () => {
+      // Fade out loader overlay
+      loaderOverlay.style.transition = 'opacity 0.5s ease';
+      loaderOverlay.style.opacity = '0';
+      setTimeout(() => {
+        loaderOverlay.style.display = 'none';
+        // Reveal main content
+        mainContent.classList.add('show');
+        // Allow page scrolling now
+        document.body.style.overflow = 'auto';
+      }, 500);
+    });
+
+    // 2) COLLAPSIBLE SECTIONS
+    const sectionHeaders = document.querySelectorAll('.section-header');
+    sectionHeaders.forEach(header => {
+      header.addEventListener('click', () => {
+        const content = header.nextElementSibling;
+        content.classList.toggle('open');
+      });
+    });
+  </script>
 </body>
 </html>
