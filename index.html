@@ -1,343 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BASIL ALOMARY</title>
-
-  <!-- Favicon: "B" in IBM Plex Mono as inline SVG -->
-  <link rel="icon" type="image/svg+xml" 
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' fill='%23FFF' /%3E%3Ctext x='3' y='13' font-family='IBM Plex Mono' font-size='12' fill='%23000'%3EB%3C/text%3E%3C/svg%3E" />
-
-  <!-- Google Fonts: Montserrat for headings, Merriweather for body text -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
-
+  <!-- Google Font: Inter (inspired by michaelg.fr) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* CSS Variables for consistency */
-    :root {
-      --bg-color: #000;
-      --text-color: #fff;
-      --accent-color: #ccc;
-      --white: #fff;
-      --black: #000;
-    }
-
     /* RESET */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
-    /* BODY: centered, slightly smaller text, custom cursor */
-    body {
-      background: var(--bg-color);
-      color: var(--text-color);
-      font-family: 'Merriweather', serif;
-      font-size: 14px;
-      line-height: 1.6;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      cursor: none;  /* Hide native cursor */
+    html, body {
+      height: 100%;
     }
-
-    /* CONTAINER: centered with fixed width for refined composition */
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      overflow-x: hidden;
+      position: relative;
+    }
     .container {
-      width: 450px;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
       text-align: center;
       position: relative;
       z-index: 2;
     }
-    @media (max-width: 600px) {
-      .container {
-        width: 90%;
-      }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.1em;
     }
-
-    /* LOADER OVERLAY */
-    .loader-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
+    .section {
+      margin: 2rem 0;
     }
-    .loading-bar {
-      width: 120px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .loading-fill {
-      height: 100%;
-      background: var(--white);
-      width: 0%;
-      border-radius: 2px;
-      animation: loadAnim 2.4s linear forwards;
-    }
-    @keyframes loadAnim {
-      from { width: 0%; }
-      to   { width: 100%; }
-    }
-    .loader-fade-out {
-      animation: fadeOut 0.5s forwards;
-    }
-    @keyframes fadeOut {
-      to {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-    }
-
-    /* MAIN CONTENT: subtle entrance */
-    .main-content {
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    .main-content.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* NAME styling using Montserrat */
-    .name {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 1.5rem;
-      letter-spacing: 2px;
-      margin-bottom: 16px;
-    }
-
-    /* SECTIONS layout */
-    .sections {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .section-header {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 1.125rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 1px;
-      transition: color 0.2s ease, transform 0.2s ease;
-      cursor: pointer;
-    }
-    .section-header:hover {
-      color: var(--accent-color);
-      transform: scale(1.02);
-    }
-
-    /* COLLAPSIBLE CONTENT with full‑width reveal & subtle depth */
-    .section-content {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: max-height 0.6s ease, opacity 0.6s ease;
-    }
-    .section-content.open {
-      opacity: 1;
-      max-height: 800px;
-      transition: max-height 0.8s ease, opacity 0.8s ease;
-      width: 100vw;
-      position: relative;
-      left: 50%;
-      right: 50%;
-      margin-left: -50vw;
-      margin-right: -50vw;
-      padding: 24px;
-      box-sizing: border-box;
-      background: var(--white);
-      color: var(--black);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-      border-top: 4px solid var(--bg-color);
-      border-bottom: 4px solid var(--bg-color);
-    }
-    .section-content p {
-      font-size: 1rem;
-      margin: 8px 0;
-    }
-
-    /* LINK STYLING: ensure legibility on white background */
     a {
-      color: var(--text-color);
+      color: #fff;
       text-decoration: none;
-      border-bottom: 1px solid transparent;
-      transition: border-color 0.2s ease;
+      position: relative;
     }
     a:hover {
-      border-color: var(--text-color);
+      text-decoration: underline;
     }
-    .section-content.open a {
-      color: var(--black);
-    }
-    .section-content.open a:hover {
-      border-color: var(--black);
-    }
-
-    /* CUSTOM CURSOR: a refined pulsing radial-gradient circle */
-    .custom-cursor {
+    /* Tooltip for hyperlink preview (inspired by daniels.link) */
+    .tooltip {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 20px;
-      height: 20px;
-      background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.4) 60%, rgba(255,255,255,0) 100%);
-      border-radius: 50%;
+      padding: 0.5rem 1rem;
+      background: rgba(255,255,255,0.9);
+      color: #000;
+      font-size: 0.875rem;
+      border-radius: 4px;
       pointer-events: none;
-      transform: translate(-50%, -50%);
-      z-index: 10000;
-      will-change: transform;
-      animation: pulse 1.5s infinite;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.8);
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 1000;
     }
-    @keyframes pulse {
-      0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-      }
-      50% {
-        transform: translate(-50%, -50%) scale(1.5);
-        opacity: 0.7;
-      }
-      100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-      }
+    .tooltip.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    /* Minimal content styling */
+    .content {
+      margin-top: 1rem;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .content.visible {
+      opacity: 1;
     }
   </style>
 </head>
 <body>
-  <!-- LOADER OVERLAY -->
-  <div class="loader-overlay" id="loaderOverlay">
-    <div class="loading-bar">
-      <div class="loading-fill"></div>
-    </div>
-  </div>
-
-  <!-- MAIN CONTENT -->
   <div class="container">
-    <div class="main-content" id="mainContent">
-      <div class="name">BASIL ALOMARY</div>
-      <div class="sections">
-        <!-- ABOUT SECTION -->
-        <div class="section">
-          <div class="section-header">About</div>
-          <div class="section-content">
-            <p>
-              Principal, Head of Research &amp; Growth Strategy at 
-              <a href="https://www.stripes.co" target="_blank">Stripes</a>.
-              <br>Previously: Consultant at 
-              <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> and VP of Growth at 
-              <a href="https://www.simondata.com" target="_blank">Simon Data</a>.
-            </p>
-            <p>
-              Consult, advise, and invest in funds and start-ups. Including:
-              <a href="https://www.wayfaster.com" target="_blank">Wayfaster</a>,
-              <a href="https://www.cedar.com" target="_blank">Cedar Health</a>,
-              <a href="https://www.klara.com" target="_blank">Klara</a>,
-              <a href="https://www.go-maestro.com" target="_blank">Maestro</a>,
-              <a href="https://www.eigentech.com" target="_blank">Eigen</a>,
-              <a href="https://www.goethena.com" target="_blank">Ethena</a>, and others.
-            </p>
-          </div>
-        </div>
-
-        <!-- WRITING SECTION -->
-        <div class="section">
-          <div class="section-header">Writing</div>
-          <div class="section-content">
-            <p>
-              <a href="https://www.forbes.com/sites/columbiabusinessschool/2020/10/04/why-investors-should-focus-more-on-the-infrastructure-supporting-the-ai-revolution/" target="_blank">
-                Infrastructure Supporting the AI Revolution (Forbes)
-              </a>
-            </p>
-            <p>
-              <a href="https://www.forbes.com/sites/columbiabusinessschool/2020/04/30/ok-boomer-how-aging-population-impact-real-estate-tech/#21fc8cdc3241" target="_blank">
-                OK, Boomer: Aging Population & Real Estate Tech (Forbes)
-              </a>
-            </p>
-            <p>
-              <a href="https://medium.com/@basil.a.alomary/nfts-like-all-art-are-all-about-narrative-bc0bb5edd81" target="_blank">
-                NFTs & the Power of Narrative (Medium)
-              </a>
-            </p>
-            <p>
-              <a href="https://wire.insiderfinance.io/where-am-i-going-to-display-my-nft-and-other-stupid-questions-acd868cd4f04" target="_blank">
-                Where am I going to display my NFT? (InsiderFinance)
-              </a>
-            </p>
-            <p>
-              <a href="https://medium.com/thoughts-from-primary-venture-partners/the-future-of-insurtech-why-serving-policyholders-has-been-the-path-to-growth-for-so-many-320b2c2b76b6" target="_blank">
-                The Future of InsurTech (Medium)
-              </a>
-            </p>
-          </div>
-        </div>
-
-        <!-- CONTACT SECTION -->
-        <div class="section">
-          <div class="section-header">Contact</div>
-          <div class="section-content">
-            <p>
-              LinkedIn:
-              <a href="https://www.linkedin.com/in/basilalomary" target="_blank">
-                linkedin.com/in/basilalomary
-              </a>
-            </p>
-            <p>
-              Twitter:
-              <a href="https://twitter.com/basil_alomary" target="_blank">
-                twitter.com/basil_alomary
-              </a>
-            </p>
-          </div>
-        </div>
-      </div>
+    <!-- Main heading with text scramble effect -->
+    <h1 id="scrambleText">BASIL ALOMARY</h1>
+    
+    <!-- Example sections -->
+    <div class="section">
+      <p class="content" id="aboutText">
+        Principal, Head of Research &amp; Growth Strategy at 
+        <a href="https://www.stripes.co" target="_blank">Stripes</a>. 
+        Previously: Consultant at 
+        <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> and VP of Growth at 
+        <a href="https://www.simondata.com" target="_blank">Simon Data</a>.
+      </p>
+    </div>
+    <div class="section">
+      <p class="content" id="writingText">
+        Writing: Read articles on Forbes, Medium, and more.
+      </p>
+    </div>
+    <div class="section">
+      <p class="content" id="contactText">
+        Contact: 
+        <a href="https://www.linkedin.com/in/basilalomary" target="_blank">LinkedIn</a> | 
+        <a href="https://twitter.com/basil_alomary" target="_blank">Twitter</a>
+      </p>
     </div>
   </div>
-
-  <!-- Custom Cursor Element -->
-  <div class="custom-cursor"></div>
-
+  
+  <!-- Tooltip element for hyperlink preview -->
+  <div class="tooltip" id="linkTooltip"></div>
+  
   <script>
-    // LOADER & CONTENT REVEAL
-    const loaderOverlay = document.getElementById('loaderOverlay');
-    const loadingFill = document.querySelector('.loading-fill');
-    const mainContent = document.getElementById('mainContent');
-    loadingFill.addEventListener('animationend', () => {
-      loaderOverlay.classList.add('loader-fade-out');
-      setTimeout(() => {
-        loaderOverlay.style.display = 'none';
-        mainContent.classList.add('show');
-        document.body.style.overflow = 'auto';
-      }, 500);
-    });
-
-    // Accordion: Only one section open at a time
-    const headers = document.querySelectorAll('.section-header');
-    const contents = document.querySelectorAll('.section-content');
-    headers.forEach(header => {
-      header.addEventListener('click', () => {
-        contents.forEach(c => {
-          if (c !== header.nextElementSibling) {
-            c.classList.remove('open');
+    /***** TEXT SCRAMBLE EFFECT *****/
+    // Adapted from a popular TextScramble implementation
+    class TextScramble {
+      constructor(el) {
+        this.el = el;
+        this.chars = '!<>-_\\/[]{}—=+*^?#________';
+        this.update = this.update.bind(this);
+      }
+      setText(newText) {
+        const oldText = this.el.innerText;
+        const length = Math.max(oldText.length, newText.length);
+        const promise = new Promise((resolve) => this.resolve = resolve);
+        this.queue = [];
+        for (let i = 0; i < length; i++) {
+          const from = oldText[i] || '';
+          const to = newText[i] || '';
+          const start = Math.floor(Math.random() * 40);
+          const end = start + Math.floor(Math.random() * 40);
+          this.queue.push({ from, to, start, end, char: '' });
+        }
+        cancelAnimationFrame(this.frameRequest);
+        this.frame = 0;
+        this.update();
+        return promise;
+      }
+      update() {
+        let output = '';
+        let complete = 0;
+        for (let i = 0, n = this.queue.length; i < n; i++) {
+          let { from, to, start, end, char } = this.queue[i];
+          if (this.frame >= end) {
+            complete++;
+            output += to;
+          } else if (this.frame >= start) {
+            if (!char || Math.random() < 0.28) {
+              char = this.randomChar();
+              this.queue[i].char = char;
+            }
+            output += `<span style="opacity:0.8">${char}</span>`;
+          } else {
+            output += from;
           }
-        });
-        header.nextElementSibling.classList.toggle('open');
-      });
+        }
+        this.el.innerHTML = output;
+        if (complete === this.queue.length) {
+          this.resolve();
+        } else {
+          this.frameRequest = requestAnimationFrame(this.update);
+          this.frame++;
+        }
+      }
+      randomChar() {
+        return this.chars[Math.floor(Math.random() * this.chars.length)];
+      }
+    }
+    
+    // Apply scramble effect on the main heading
+    const scrambleEl = document.getElementById('scrambleText');
+    const fx = new TextScramble(scrambleEl);
+    fx.setText('BASIL ALOMARY').then(() => {
+      // Once the text scramble completes, reveal the content sections
+      document.querySelectorAll('.content').forEach(el => el.classList.add('visible'));
     });
-
-    // Custom Cursor Follow
-    const customCursor = document.querySelector('.custom-cursor');
-    document.addEventListener('mousemove', (e) => {
-      customCursor.style.left = e.clientX + 'px';
-      customCursor.style.top = e.clientY + 'px';
+    
+    /***** HYPERLINK PREVIEW TOOLTIP (inspired by daniels.link) *****/
+    const tooltip = document.getElementById('linkTooltip');
+    document.querySelectorAll('a').forEach(link => {
+      link.addEventListener('mouseenter', () => {
+        tooltip.innerText = link.href;
+        tooltip.classList.add('show');
+      });
+      link.addEventListener('mouseleave', () => {
+        tooltip.classList.remove('show');
+      });
+      link.addEventListener('mousemove', (e) => {
+        tooltip.style.left = e.clientX + 'px';
+        tooltip.style.top = (e.clientY - 20) + 'px';
+      });
     });
   </script>
 </body>
