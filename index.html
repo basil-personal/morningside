@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BASIL ALOMARY</title>
-  <!-- Google Font: Inter (inspired by michaelg.fr) -->
+  <!-- Google Font: Inter (similar to michaelg.fr) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* RESET */
@@ -20,61 +20,42 @@
       background: #000;
       color: #fff;
       font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
-      overflow-x: hidden;
-      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      padding: 1rem;
     }
     .container {
       max-width: 600px;
-      margin: 0 auto;
-      padding: 2rem;
-      text-align: center;
-      position: relative;
-      z-index: 2;
     }
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1.5rem;
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
       letter-spacing: 0.1em;
     }
-    .section {
-      margin: 2rem 0;
+    p.description {
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      opacity: 0.8;
     }
-    a {
+    ul.links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul.links li {
+      margin: 1.25rem 0;
+    }
+    ul.links a {
+      font-size: 1.25rem;
       color: #fff;
       text-decoration: none;
-      position: relative;
+      transition: color 0.2s;
     }
-    a:hover {
-      text-decoration: underline;
-    }
-    /* Tooltip for hyperlink preview (inspired by daniels.link) */
-    .tooltip {
-      position: fixed;
-      padding: 0.5rem 1rem;
-      background: rgba(255,255,255,0.9);
-      color: #000;
-      font-size: 0.875rem;
-      border-radius: 4px;
-      pointer-events: none;
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.8);
-      transition: opacity 0.2s, transform 0.2s;
-      z-index: 1000;
-    }
-    .tooltip.show {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    /* Minimal content styling */
-    .content {
-      margin-top: 1rem;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    .content.visible {
-      opacity: 1;
+    ul.links a:hover {
+      color: #ccc;
     }
   </style>
 </head>
@@ -82,37 +63,23 @@
   <div class="container">
     <!-- Main heading with text scramble effect -->
     <h1 id="scrambleText">BASIL ALOMARY</h1>
-    
-    <!-- Example sections -->
-    <div class="section">
-      <p class="content" id="aboutText">
-        Principal, Head of Research &amp; Growth Strategy at 
-        <a href="https://www.stripes.co" target="_blank">Stripes</a>. 
-        Previously: Consultant at 
-        <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> and VP of Growth at 
-        <a href="https://www.simondata.com" target="_blank">Simon Data</a>.
-      </p>
-    </div>
-    <div class="section">
-      <p class="content" id="writingText">
-        Writing: Read articles on Forbes, Medium, and more.
-      </p>
-    </div>
-    <div class="section">
-      <p class="content" id="contactText">
-        Contact: 
-        <a href="https://www.linkedin.com/in/basilalomary" target="_blank">LinkedIn</a> | 
-        <a href="https://twitter.com/basil_alomary" target="_blank">Twitter</a>
-      </p>
-    </div>
+    <!-- Brief description directly below the name -->
+    <p class="description">
+      Investor. Strategist. Writer.
+      Building ideas that transform industries.
+    </p>
+    <!-- Personal links -->
+    <ul class="links">
+      <li><a href="https://www.linkedin.com/in/basilalomary" target="_blank">LinkedIn</a></li>
+      <li><a href="https://twitter.com/basil_alomary" target="_blank">Twitter</a></li>
+      <li><a href="https://medium.com/@basil.a.alomary" target="_blank">Writing</a></li>
+      <li><a href="mailto:basil@alomary.com" target="_blank">Contact</a></li>
+    </ul>
   </div>
-  
-  <!-- Tooltip element for hyperlink preview -->
-  <div class="tooltip" id="linkTooltip"></div>
-  
+
   <script>
     /***** TEXT SCRAMBLE EFFECT *****/
-    // Adapted from a popular TextScramble implementation
+    // A TextScramble class adapted for a minimal effect
     class TextScramble {
       constructor(el) {
         this.el = el;
@@ -166,30 +133,11 @@
         return this.chars[Math.floor(Math.random() * this.chars.length)];
       }
     }
-    
-    // Apply scramble effect on the main heading
+
+    // Start the scramble effect on the main heading
     const scrambleEl = document.getElementById('scrambleText');
     const fx = new TextScramble(scrambleEl);
-    fx.setText('BASIL ALOMARY').then(() => {
-      // Once the text scramble completes, reveal the content sections
-      document.querySelectorAll('.content').forEach(el => el.classList.add('visible'));
-    });
-    
-    /***** HYPERLINK PREVIEW TOOLTIP (inspired by daniels.link) *****/
-    const tooltip = document.getElementById('linkTooltip');
-    document.querySelectorAll('a').forEach(link => {
-      link.addEventListener('mouseenter', () => {
-        tooltip.innerText = link.href;
-        tooltip.classList.add('show');
-      });
-      link.addEventListener('mouseleave', () => {
-        tooltip.classList.remove('show');
-      });
-      link.addEventListener('mousemove', (e) => {
-        tooltip.style.left = e.clientX + 'px';
-        tooltip.style.top = (e.clientY - 20) + 'px';
-      });
-    });
+    fx.setText('BASIL ALOMARY');
   </script>
 </body>
 </html>
