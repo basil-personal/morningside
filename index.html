@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BASIL ALOMARY</title>
 
   <!-- Favicon: "B" in IBM Plex Mono as inline SVG -->
@@ -13,6 +13,16 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
 
   <style>
+    /* CSS Variables for easy maintenance */
+    :root {
+      --bg-color: #000;
+      --text-color: #fff;
+      --accent-color: #ccc;
+      --white: #fff;
+      --black: #000;
+      --loader-duration: 2.4s;
+    }
+
     /* RESET */
     * {
       margin: 0;
@@ -20,34 +30,39 @@
       box-sizing: border-box;
     }
 
-    /* BODY - center content vertically & horizontally, hide native cursor */
+    /* BODY: full viewport, custom cursor hidden */
     body {
-      background: #000;
-      color: #fff;
+      background: var(--bg-color);
+      color: var(--text-color);
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 9px;      /* small base font */
-      line-height: 1.2;     /* tight line-height */
-      height: 100vh; 
+      font-size: 16px;
+      line-height: 1.5;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;     /* hide scroll until loader completes */
-      cursor: none;         /* hide default cursor */
+      overflow: hidden; /* until loader completes */
+      cursor: none;     /* hide the native pointer */
     }
 
-    /* CONTAINER - narrow width so text sits in the center */
+    /* RESPONSIVE CONTAINER */
     .container {
-      width: 450px;         /* adjust if you want it narrower or wider */
-      text-align: center;
       position: relative;
-      z-index: 1;           /* so that the content stays above the background */
+      z-index: 2;
+      width: 450px;
+      text-align: center;
+    }
+    @media (max-width: 600px) {
+      .container {
+        width: 90%;
+      }
     }
 
-    /* LOADER OVERLAY */
+    /* LOADER OVERLAY with fade-out */
     .loader-overlay {
       position: fixed;
       inset: 0;
-      background: #000;
+      background: var(--bg-color);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -56,123 +71,138 @@
     .loading-bar {
       position: relative;
       width: 120px;
-      height: 2px;
+      height: 4px;
       background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
     }
     .loading-fill {
       position: absolute;
-      left: 0; 
       top: 0;
-      width: 0%;
+      left: 0;
       height: 100%;
-      background: #fff;
-      animation: loadAnim 2.4s linear forwards;
+      background: var(--white);
+      width: 0%;
+      border-radius: 2px;
+      animation: loadAnim var(--loader-duration) linear forwards;
     }
     @keyframes loadAnim {
-      0%   { width: 0%; }
-      100% { width: 100%; }
+      from { width: 0%; }
+      to   { width: 100%; }
+    }
+    /* Fade out the loader (with a subtle scale) */
+    .loader-fade-out {
+      animation: fadeOut 0.5s forwards;
+    }
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: scale(0.95);
+      }
     }
 
-    /* MAIN CONTENT (hidden until loader completes) */
+    /* MAIN CONTENT: entrance animation */
     .main-content {
       opacity: 0;
       transform: translateY(10px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .main-content.show {
       opacity: 1;
       transform: translateY(0);
     }
 
-    /* NAME at top, uppercase, slightly bigger but still tight */
+    /* NAME styling */
     .name {
-      font-size: 1.5rem;
+      font-size: 2rem;
       letter-spacing: 2px;
-      margin-bottom: 8px;
+      margin-bottom: 16px;
     }
 
-    /* SECTIONS WRAPPER */
+    /* SECTIONS */
     .sections {
       display: flex;
       flex-direction: column;
-      gap: 6px; /* tight spacing between sections */
+      gap: 16px;
     }
     .section-header {
-      cursor: pointer;
+      font-size: 1.125rem;
       text-transform: uppercase;
       font-weight: bold;
       letter-spacing: 1px;
-      transition: color 0.2s ease;
-      margin-top: 8px;
+      transition: color 0.2s ease, transform 0.2s ease;
+      cursor: pointer;
     }
     .section-header:hover {
-      color: #ccc;
+      color: var(--accent-color);
+      transform: scale(1.02);
     }
 
-    /* COLLAPSIBLE CONTENT - tight transitions */
+    /* COLLAPSIBLE CONTENT with refined transition & full-width reveal */
     .section-content {
       max-height: 0;
-      overflow: hidden;
       opacity: 0;
-      transition: max-height 0.3s ease, opacity 0.3s ease;
+      overflow: hidden;
+      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    /* When open, make the content background span the full viewport width.
-       The negative margins trick pulls it out of the 450px container. */
     .section-content.open {
-      background: #fff;
-      color: #000;
-      max-height: 300px; /* adjust if you have more content */
       opacity: 1;
-      padding: 16px;
+      max-height: 800px; /* ensure enough space for content */
+      transition: max-height 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      /* Full-width effect using negative margins */
       width: 100vw;
       position: relative;
       left: 50%;
       right: 50%;
       margin-left: -50vw;
       margin-right: -50vw;
+      padding: 24px;
       box-sizing: border-box;
-      /* Optional: if you want a subtle shadow to emphasize the layered effect */
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      background: var(--white);
+      color: var(--black);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      border-top: 4px solid var(--bg-color);
+      border-bottom: 4px solid var(--bg-color);
     }
-
-    /* TIGHT PARAGRAPHS */
     .section-content p {
-      font-size: 0.9rem;
-      margin: 4px 0;
-      line-height: 1.2;
+      font-size: 1rem;
+      margin: 8px 0;
+      line-height: 1.6;
     }
 
-    /* LINK STYLING */
+    /* LINKS: default dark text in opened sections for legibility */
     a {
-      color: #fff;
+      color: var(--text-color);
       text-decoration: none;
       border-bottom: 1px solid transparent;
       transition: border-color 0.2s ease;
     }
     a:hover {
-      border-color: #fff;
+      border-color: var(--text-color);
     }
-    /* Override link color in open (white background) content */
     .section-content.open a {
-      color: #000;
-      border-bottom-color: transparent;
+      color: var(--black);
     }
     .section-content.open a:hover {
-      border-bottom-color: #000;
+      border-color: var(--black);
     }
 
-    /* CUSTOM CURSOR - pulsing white circle */
+    /* CUSTOM CURSOR: a bold, pulsing, radial-gradient circle */
     .custom-cursor {
       position: fixed;
       top: 0;
       left: 0;
       width: 20px;
       height: 20px;
-      background: rgba(255, 255, 255, 0.8);
+      background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.4) 60%, rgba(255,255,255,0) 100%);
       border-radius: 50%;
       pointer-events: none;
       transform: translate(-50%, -50%);
       z-index: 10000;
+      will-change: transform;
       animation: pulse 1.5s infinite;
     }
     @keyframes pulse {
@@ -182,7 +212,7 @@
       }
       50% {
         transform: translate(-50%, -50%) scale(1.5);
-        opacity: 0.5;
+        opacity: 0.7;
       }
       100% {
         transform: translate(-50%, -50%) scale(1);
@@ -192,9 +222,8 @@
   </style>
 </head>
 <body>
-
   <!-- LOADER OVERLAY -->
-  <div class="loader-overlay">
+  <div class="loader-overlay" id="loaderOverlay">
     <div class="loading-bar">
       <div class="loading-fill"></div>
     </div>
@@ -203,26 +232,21 @@
   <!-- MAIN CONTENT -->
   <div class="container">
     <div class="main-content" id="mainContent">
-      
-      <!-- NAME ONLY -->
       <div class="name">BASIL ALOMARY</div>
-
-      <!-- COLLAPSIBLE SECTIONS -->
       <div class="sections">
-        
-        <!-- ABOUT -->
+        <!-- ABOUT SECTION -->
         <div class="section">
           <div class="section-header">About</div>
           <div class="section-content">
             <p>
               Principal, Head of Research &amp; Growth Strategy at 
-              <a href="https://www.stripes.co" target="_blank">Stripes</a>. 
+              <a href="https://www.stripes.co" target="_blank">Stripes</a>.  
               <br>Previously: Consultant at 
-              <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> and VP of Growth at
+              <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> and VP of Growth at 
               <a href="https://www.simondata.com" target="_blank">Simon Data</a>.
             </p>
             <p>
-              Consult, advise, and invest in funds and start-ups. Including:
+              Consult, advise, and invest in funds and start-ups. Including: 
               <a href="https://www.wayfaster.com" target="_blank">Wayfaster</a>, 
               <a href="https://www.cedar.com" target="_blank">Cedar Health</a>, 
               <a href="https://www.klara.com" target="_blank">Klara</a>, 
@@ -232,8 +256,7 @@
             </p>
           </div>
         </div>
-
-        <!-- WRITING -->
+        <!-- WRITING SECTION -->
         <div class="section">
           <div class="section-header">Writing</div>
           <div class="section-content">
@@ -250,27 +273,26 @@
               </a>
             </p>
             <p>
-              <a href="https://medium.com/@basil.a.alomary/nfts-like-all-art-are-all-about-narrative-bc0bb5edd81"
+              <a href="https://medium.com/@basil.a.alomary/nfts-like-all-art-are-all-about-narrative-bc0bb5edd81" 
                  target="_blank">
                 NFTs & the Power of Narrative (Medium)
               </a>
             </p>
             <p>
-              <a href="https://wire.insiderfinance.io/where-am-i-going-to-display-my-nft-and-other-stupid-questions-acd868cd4f04"
+              <a href="https://wire.insiderfinance.io/where-am-i-going-to-display-my-nft-and-other-stupid-questions-acd868cd4f04" 
                  target="_blank">
                 Where am I going to display my NFT? (InsiderFinance)
               </a>
             </p>
             <p>
-              <a href="https://medium.com/thoughts-from-primary-venture-partners/the-future-of-insurtech-why-serving-policyholders-has-been-the-path-to-growth-for-so-many-320b2c2b76b6"
+              <a href="https://medium.com/thoughts-from-primary-venture-partners/the-future-of-insurtech-why-serving-policyholders-has-been-the-path-to-growth-for-so-many-320b2c2b76b6" 
                  target="_blank">
                 The Future of InsurTech (Medium)
               </a>
             </p>
           </div>
         </div>
-
-        <!-- CONTACT -->
+        <!-- CONTACT SECTION -->
         <div class="section">
           <div class="section-header">Contact</div>
           <div class="section-content">
@@ -292,44 +314,43 @@
     </div>
   </div>
 
-  <!-- Custom Cursor Element -->
+  <!-- CUSTOM CURSOR -->
   <div class="custom-cursor"></div>
 
   <script>
-    // LOADER
-    const loaderOverlay = document.querySelector('.loader-overlay');
+    // When the loading fill animation ends, fade out the loader and reveal content.
+    const loaderOverlay = document.getElementById('loaderOverlay');
     const loadingFill   = document.querySelector('.loading-fill');
     const mainContent   = document.getElementById('mainContent');
 
     loadingFill.addEventListener('animationend', () => {
-      loaderOverlay.style.transition = 'opacity 0.3s ease';
-      loaderOverlay.style.opacity = '0';
+      loaderOverlay.classList.add('loader-fade-out');
       setTimeout(() => {
         loaderOverlay.style.display = 'none';
         mainContent.classList.add('show');
         document.body.style.overflow = 'auto'; // re-enable scrolling if needed
-      }, 300);
+      }, 500);
     });
 
-    // ACCORDION (only one open at a time)
-    const sectionHeaders = document.querySelectorAll('.section-header');
-    const allContents    = document.querySelectorAll('.section-content');
-
-    sectionHeaders.forEach(header => {
+    // Accordion behavior: Only one section open at a time.
+    const headers  = document.querySelectorAll('.section-header');
+    const contents = document.querySelectorAll('.section-content');
+    headers.forEach(header => {
       header.addEventListener('click', () => {
-        // Close all other sections
-        allContents.forEach(cnt => cnt.classList.remove('open'));
-        // Open the clicked section
-        const content = header.nextElementSibling;
-        content.classList.add('open');
+        contents.forEach(c => {
+          if (c !== header.nextElementSibling) {
+            c.classList.remove('open');
+          }
+        });
+        header.nextElementSibling.classList.toggle('open');
       });
     });
 
-    // CUSTOM CURSOR: update its position based on mouse movement
+    // Custom cursor: follow the mouse with smooth positioning.
     const customCursor = document.querySelector('.custom-cursor');
     document.addEventListener('mousemove', (e) => {
       customCursor.style.left = e.clientX + 'px';
-      customCursor.style.top = e.clientY + 'px';
+      customCursor.style.top  = e.clientY + 'px';
     });
   </script>
 </body>
