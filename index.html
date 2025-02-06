@@ -9,8 +9,8 @@
   <link rel="icon" type="image/svg+xml" 
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' fill='%23FFF' /%3E%3Ctext x='3' y='13' font-family='IBM Plex Mono' font-size='12' fill='%23000'%3EB%3C/text%3E%3C/svg%3E" />
 
-  <!-- Google Font: IBM Plex Mono -->
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+  <!-- Google Fonts: Montserrat for headings, Merriweather for body text -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
 
   <style>
     /* CSS Variables for consistency */
@@ -20,7 +20,6 @@
       --accent-color: #ccc;
       --white: #fff;
       --black: #000;
-      --loader-duration: 2.4s;
     }
 
     /* RESET */
@@ -30,36 +29,27 @@
       box-sizing: border-box;
     }
 
-    /* The Particle Canvas as a dynamic background */
-    #particle-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      background: var(--bg-color);
-    }
-
-    /* BODY: full viewport, custom cursor hidden */
+    /* BODY: centered, slightly smaller text, custom cursor */
     body {
       background: var(--bg-color);
       color: var(--text-color);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 16px;
-      line-height: 1.5;
+      font-family: 'Merriweather', serif;
+      font-size: 14px;
+      line-height: 1.6;
       height: 100vh;
-      overflow: hidden; /* until loader completes */
-      cursor: none;     /* hide the native pointer */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      cursor: none;  /* Hide native cursor */
     }
 
-    /* RESPONSIVE CONTAINER: higher z-index than the canvas */
+    /* CONTAINER: centered with fixed width for refined composition */
     .container {
-      position: relative;
-      z-index: 2;
       width: 450px;
       text-align: center;
-      margin: 0 auto;
+      position: relative;
+      z-index: 2;
     }
     @media (max-width: 600px) {
       .container {
@@ -67,7 +57,7 @@
       }
     }
 
-    /* LOADER OVERLAY with fade-out */
+    /* LOADER OVERLAY */
     .loader-overlay {
       position: fixed;
       inset: 0;
@@ -78,7 +68,6 @@
       z-index: 999;
     }
     .loading-bar {
-      position: relative;
       width: 120px;
       height: 4px;
       background: rgba(255, 255, 255, 0.2);
@@ -86,20 +75,16 @@
       overflow: hidden;
     }
     .loading-fill {
-      position: absolute;
-      top: 0;
-      left: 0;
       height: 100%;
       background: var(--white);
       width: 0%;
       border-radius: 2px;
-      animation: loadAnim var(--loader-duration) linear forwards;
+      animation: loadAnim 2.4s linear forwards;
     }
     @keyframes loadAnim {
       from { width: 0%; }
       to   { width: 100%; }
     }
-    /* Fade out the loader (with a subtle scale) */
     .loader-fade-out {
       animation: fadeOut 0.5s forwards;
     }
@@ -110,35 +95,36 @@
       }
     }
 
-    /* MAIN CONTENT: entrance animation */
+    /* MAIN CONTENT: subtle entrance */
     .main-content {
       opacity: 0;
       transform: translateY(10px);
-      transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-                  transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: opacity 0.4s ease, transform 0.4s ease;
     }
     .main-content.show {
       opacity: 1;
       transform: translateY(0);
     }
 
-    /* NAME styling */
+    /* NAME styling using Montserrat */
     .name {
-      font-size: 2rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.5rem;
       letter-spacing: 2px;
       margin-bottom: 16px;
     }
 
-    /* SECTIONS */
+    /* SECTIONS layout */
     .sections {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
     .section-header {
+      font-family: 'Montserrat', sans-serif;
       font-size: 1.125rem;
       text-transform: uppercase;
-      font-weight: bold;
+      font-weight: 700;
       letter-spacing: 1px;
       transition: color 0.2s ease, transform 0.2s ease;
       cursor: pointer;
@@ -148,20 +134,17 @@
       transform: scale(1.02);
     }
 
-    /* COLLAPSIBLE CONTENT with a full-width reveal & 3D depth */
+    /* COLLAPSIBLE CONTENT with full‑width reveal & subtle depth */
     .section-content {
       max-height: 0;
       opacity: 0;
       overflow: hidden;
-      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: max-height 0.6s ease, opacity 0.6s ease;
     }
     .section-content.open {
       opacity: 1;
-      max-height: 800px; /* ensure enough space for content */
-      transition: max-height 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-                  opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-      /* Full-width effect using negative margins */
+      max-height: 800px;
+      transition: max-height 0.8s ease, opacity 0.8s ease;
       width: 100vw;
       position: relative;
       left: 50%;
@@ -175,16 +158,13 @@
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
       border-top: 4px solid var(--bg-color);
       border-bottom: 4px solid var(--bg-color);
-      /* Adding subtle 3D depth */
-      transform: perspective(1000px) translateZ(0);
     }
     .section-content p {
       font-size: 1rem;
       margin: 8px 0;
-      line-height: 1.6;
     }
 
-    /* LINKS: use dark text for legibility on white */
+    /* LINK STYLING: ensure legibility on white background */
     a {
       color: var(--text-color);
       text-decoration: none;
@@ -201,7 +181,7 @@
       border-color: var(--black);
     }
 
-    /* CUSTOM CURSOR: a bold, pulsing, radial-gradient circle */
+    /* CUSTOM CURSOR: a refined pulsing radial-gradient circle */
     .custom-cursor {
       position: fixed;
       top: 0;
@@ -233,9 +213,6 @@
   </style>
 </head>
 <body>
-  <!-- Particle Background Canvas -->
-  <canvas id="particle-canvas"></canvas>
-
   <!-- LOADER OVERLAY -->
   <div class="loader-overlay" id="loaderOverlay">
     <div class="loading-bar">
@@ -254,70 +231,67 @@
           <div class="section-content">
             <p>
               Principal, Head of Research &amp; Growth Strategy at 
-              <a href="https://www.stripes.co" target="_blank">Stripes</a>.  
+              <a href="https://www.stripes.co" target="_blank">Stripes</a>.
               <br>Previously: Consultant at 
               <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> and VP of Growth at 
               <a href="https://www.simondata.com" target="_blank">Simon Data</a>.
             </p>
             <p>
-              Consult, advise, and invest in funds and start-ups. Including: 
-              <a href="https://www.wayfaster.com" target="_blank">Wayfaster</a>, 
-              <a href="https://www.cedar.com" target="_blank">Cedar Health</a>, 
-              <a href="https://www.klara.com" target="_blank">Klara</a>, 
-              <a href="https://www.go-maestro.com" target="_blank">Maestro</a>, 
-              <a href="https://www.eigentech.com" target="_blank">Eigen</a>, 
+              Consult, advise, and invest in funds and start-ups. Including:
+              <a href="https://www.wayfaster.com" target="_blank">Wayfaster</a>,
+              <a href="https://www.cedar.com" target="_blank">Cedar Health</a>,
+              <a href="https://www.klara.com" target="_blank">Klara</a>,
+              <a href="https://www.go-maestro.com" target="_blank">Maestro</a>,
+              <a href="https://www.eigentech.com" target="_blank">Eigen</a>,
               <a href="https://www.goethena.com" target="_blank">Ethena</a>, and others.
             </p>
           </div>
         </div>
+
         <!-- WRITING SECTION -->
         <div class="section">
           <div class="section-header">Writing</div>
           <div class="section-content">
             <p>
-              <a href="https://www.forbes.com/sites/columbiabusinessschool/2020/10/04/why-investors-should-focus-more-on-the-infrastructure-supporting-the-ai-revolution/" 
-                 target="_blank">
+              <a href="https://www.forbes.com/sites/columbiabusinessschool/2020/10/04/why-investors-should-focus-more-on-the-infrastructure-supporting-the-ai-revolution/" target="_blank">
                 Infrastructure Supporting the AI Revolution (Forbes)
               </a>
             </p>
             <p>
-              <a href="https://www.forbes.com/sites/columbiabusinessschool/2020/04/30/ok-boomer-how-aging-population-impact-real-estate-tech/#21fc8cdc3241" 
-                 target="_blank">
+              <a href="https://www.forbes.com/sites/columbiabusinessschool/2020/04/30/ok-boomer-how-aging-population-impact-real-estate-tech/#21fc8cdc3241" target="_blank">
                 OK, Boomer: Aging Population & Real Estate Tech (Forbes)
               </a>
             </p>
             <p>
-              <a href="https://medium.com/@basil.a.alomary/nfts-like-all-art-are-all-about-narrative-bc0bb5edd81" 
-                 target="_blank">
+              <a href="https://medium.com/@basil.a.alomary/nfts-like-all-art-are-all-about-narrative-bc0bb5edd81" target="_blank">
                 NFTs & the Power of Narrative (Medium)
               </a>
             </p>
             <p>
-              <a href="https://wire.insiderfinance.io/where-am-i-going-to-display-my-nft-and-other-stupid-questions-acd868cd4f04" 
-                 target="_blank">
+              <a href="https://wire.insiderfinance.io/where-am-i-going-to-display-my-nft-and-other-stupid-questions-acd868cd4f04" target="_blank">
                 Where am I going to display my NFT? (InsiderFinance)
               </a>
             </p>
             <p>
-              <a href="https://medium.com/thoughts-from-primary-venture-partners/the-future-of-insurtech-why-serving-policyholders-has-been-the-path-to-growth-for-so-many-320b2c2b76b6" 
-                 target="_blank">
+              <a href="https://medium.com/thoughts-from-primary-venture-partners/the-future-of-insurtech-why-serving-policyholders-has-been-the-path-to-growth-for-so-many-320b2c2b76b6" target="_blank">
                 The Future of InsurTech (Medium)
               </a>
             </p>
           </div>
         </div>
+
         <!-- CONTACT SECTION -->
         <div class="section">
           <div class="section-header">Contact</div>
           <div class="section-content">
             <p>
-              LinkedIn: 
+              LinkedIn:
               <a href="https://www.linkedin.com/in/basilalomary" target="_blank">
                 linkedin.com/in/basilalomary
               </a>
             </p>
             <p>
-              Twitter: 
+              Twitter:
               <a href="https://twitter.com/basil_alomary" target="_blank">
                 twitter.com/basil_alomary
               </a>
@@ -328,26 +302,25 @@
     </div>
   </div>
 
-  <!-- CUSTOM CURSOR -->
+  <!-- Custom Cursor Element -->
   <div class="custom-cursor"></div>
 
   <script>
-    /***** Loader & Content Reveal *****/
+    // LOADER & CONTENT REVEAL
     const loaderOverlay = document.getElementById('loaderOverlay');
-    const loadingFill   = document.querySelector('.loading-fill');
-    const mainContent   = document.getElementById('mainContent');
-
+    const loadingFill = document.querySelector('.loading-fill');
+    const mainContent = document.getElementById('mainContent');
     loadingFill.addEventListener('animationend', () => {
       loaderOverlay.classList.add('loader-fade-out');
       setTimeout(() => {
         loaderOverlay.style.display = 'none';
         mainContent.classList.add('show');
-        document.body.style.overflow = 'auto'; // re-enable scrolling if needed
+        document.body.style.overflow = 'auto';
       }, 500);
     });
 
-    /***** Accordion Behavior *****/
-    const headers  = document.querySelectorAll('.section-header');
+    // Accordion: Only one section open at a time
+    const headers = document.querySelectorAll('.section-header');
     const contents = document.querySelectorAll('.section-content');
     headers.forEach(header => {
       header.addEventListener('click', () => {
@@ -360,90 +333,11 @@
       });
     });
 
-    /***** Custom Cursor *****/
+    // Custom Cursor Follow
     const customCursor = document.querySelector('.custom-cursor');
     document.addEventListener('mousemove', (e) => {
       customCursor.style.left = e.clientX + 'px';
-      customCursor.style.top  = e.clientY + 'px';
-    });
-
-    /***** Interactive Particle Background *****/
-    const canvas = document.getElementById('particle-canvas');
-    const ctx    = canvas.getContext('2d');
-    let particles = [];
-    let mouse = { x: -100, y: -100 };
-
-    function initCanvas() {
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', () => {
-      initCanvas();
-      initParticles();
-    });
-    initCanvas();
-
-    class Particle {
-      constructor() {
-        this.reset();
-      }
-      reset() {
-        this.x  = Math.random() * canvas.width;
-        this.y  = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.5;
-        this.vy = (Math.random() - 0.5) * 0.5;
-        this.radius = Math.random() * 2 + 0.5;
-        this.alpha  = Math.random() * 0.5 + 0.3;
-      }
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        // Repel from mouse if too close
-        const dx = this.x - mouse.x;
-        const dy = this.y - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 50) {
-          const angle = Math.atan2(dy, dx);
-          this.x += Math.cos(angle);
-          this.y += Math.sin(angle);
-        }
-        // Recycle if off screen
-        if (this.x < 0 || this.x > canvas.width ||
-            this.y < 0 || this.y > canvas.height) {
-          this.reset();
-        }
-      }
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;
-        ctx.fill();
-      }
-    }
-
-    function initParticles() {
-      particles = [];
-      const count = Math.floor((canvas.width * canvas.height) / 8000);
-      for (let i = 0; i < count; i++) {
-        particles.push(new Particle());
-      }
-    }
-    initParticles();
-
-    function animateParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      requestAnimationFrame(animateParticles);
-    }
-    animateParticles();
-
-    // Update mouse position for particle repulsion
-    document.addEventListener('mousemove', (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
+      customCursor.style.top = e.clientY + 'px';
     });
   </script>
 </body>
