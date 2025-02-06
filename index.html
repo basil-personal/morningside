@@ -35,10 +35,12 @@
       cursor: none;         /* hide default cursor */
     }
 
-    /* CONTAINER - narrow width, so text sits in the center with wide side margins */
+    /* CONTAINER - narrow width so text sits in the center */
     .container {
       width: 450px;         /* adjust if you want it narrower or wider */
       text-align: center;
+      position: relative;
+      z-index: 1;           /* so that the content stays above the background */
     }
 
     /* LOADER OVERLAY */
@@ -114,15 +116,22 @@
       opacity: 0;
       transition: max-height 0.3s ease, opacity 0.3s ease;
     }
-    /* When a section is open, give it a white background that appears inset */
+    /* When open, make the content background span the full viewport width.
+       The negative margins trick pulls it out of the 450px container. */
     .section-content.open {
       background: #fff;
       color: #000;
       max-height: 300px; /* adjust if you have more content */
       opacity: 1;
-      padding: 8px;
-      border-radius: 4px;
-      margin-top: 4px;
+      padding: 16px;
+      width: 100vw;
+      position: relative;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+      box-sizing: border-box;
+      /* Optional: if you want a subtle shadow to emphasize the layered effect */
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
@@ -142,6 +151,14 @@
     }
     a:hover {
       border-color: #fff;
+    }
+    /* Override link color in open (white background) content */
+    .section-content.open a {
+      color: #000;
+      border-bottom-color: transparent;
+    }
+    .section-content.open a:hover {
+      border-bottom-color: #000;
     }
 
     /* CUSTOM CURSOR - pulsing white circle */
@@ -200,7 +217,7 @@
             <p>
               Principal, Head of Research &amp; Growth Strategy at 
               <a href="https://www.stripes.co" target="_blank">Stripes</a>. 
-          <br>Previously: Consultant at 
+              <br>Previously: Consultant at 
               <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> and VP of Growth at
               <a href="https://www.simondata.com" target="_blank">Simon Data</a>.
             </p>
