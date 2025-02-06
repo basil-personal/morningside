@@ -2,142 +2,158 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BASIL ALOMARY</title>
-  <!-- Google Font: Inter (similar to michaelg.fr) -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basil Alomary</title>
+  <!-- Import IBM Plex Sans from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* RESET */
+    /* Reset and basic settings */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     html, body {
+      width: 100%;
       height: 100%;
-    }
-    body {
       background: #000;
+      overflow: hidden;
+      font-family: 'IBM Plex Sans', sans-serif;
+      cursor: none; /* hide default cursor */
+    }
+    /* Centered main text */
+    #text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       color: #fff;
-      font-family: 'Inter', sans-serif;
-      display: flex;
+      font-size: 20px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    /* Vanish animation when clicked */
+    #text.clicked {
+      animation: vanish 0.5s forwards;
+    }
+    @keyframes vanish {
+      to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+    }
+    /* Custom pulsing cursor */
+    #custom-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      animation: pulse 1.5s infinite;
+      z-index: 1000;
+    }
+    @keyframes pulse {
+      0%   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+      50%  { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
+      100% { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+    }
+    /* Overlay for explosion effect */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      display: none; /* will be activated on click */
       align-items: center;
       justify-content: center;
-      text-align: center;
-      overflow: hidden;
-      padding: 1rem;
+      z-index: 2000;
+      pointer-events: none;
+      /* Start as a tiny circle at the click point */
+      clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
     }
-    .container {
-      max-width: 600px;
+    /* When activated, run the eruption animation */
+    #overlay.active {
+      animation: erupt 0.8s forwards;
     }
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-      letter-spacing: 0.1em;
+    @keyframes erupt {
+      from {
+        clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
+      }
+      to {
+        clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
+      }
     }
-    p.description {
-      font-size: 1rem;
-      margin-bottom: 2rem;
-      opacity: 0.8;
+    /* Overlay text that fades in after eruption */
+    #overlay-text {
+      font-size: 20px;
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+      animation-delay: 0.8s;
     }
-    ul.links {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    ul.links li {
-      margin: 1.25rem 0;
-    }
-    ul.links a {
-      font-size: 1.25rem;
-      color: #fff;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    ul.links a:hover {
-      color: #ccc;
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Main heading with text scramble effect -->
-    <h1 id="scrambleText">BASIL ALOMARY</h1>
-    <!-- Brief description directly below the name -->
-    <p class="description">
-      Investor. Strategist. Writer.
-      Building ideas that transform industries.
-    </p>
-    <!-- Personal links -->
-    <ul class="links">
-      <li><a href="https://www.linkedin.com/in/basilalomary" target="_blank">LinkedIn</a></li>
-      <li><a href="https://twitter.com/basil_alomary" target="_blank">Twitter</a></li>
-      <li><a href="https://medium.com/@basil.a.alomary" target="_blank">Writing</a></li>
-      <li><a href="mailto:basil@alomary.com" target="_blank">Contact</a></li>
-    </ul>
+  <!-- Main clickable text -->
+  <div id="text">Basil Alomary</div>
+  
+  <!-- Custom cursor element -->
+  <div id="custom-cursor"></div>
+  
+  <!-- Fullscreen overlay that will erupt on click -->
+  <div id="overlay">
+    <div id="overlay-text">We'll be back soon</div>
   </div>
-
+  
   <script>
-    /***** TEXT SCRAMBLE EFFECT *****/
-    // A TextScramble class adapted for a minimal effect
-    class TextScramble {
-      constructor(el) {
-        this.el = el;
-        this.chars = '!<>-_\\/[]{}—=+*^?#________';
-        this.update = this.update.bind(this);
-      }
-      setText(newText) {
-        const oldText = this.el.innerText;
-        const length = Math.max(oldText.length, newText.length);
-        const promise = new Promise((resolve) => this.resolve = resolve);
-        this.queue = [];
-        for (let i = 0; i < length; i++) {
-          const from = oldText[i] || '';
-          const to = newText[i] || '';
-          const start = Math.floor(Math.random() * 40);
-          const end = start + Math.floor(Math.random() * 40);
-          this.queue.push({ from, to, start, end, char: '' });
-        }
-        cancelAnimationFrame(this.frameRequest);
-        this.frame = 0;
-        this.update();
-        return promise;
-      }
-      update() {
-        let output = '';
-        let complete = 0;
-        for (let i = 0, n = this.queue.length; i < n; i++) {
-          let { from, to, start, end, char } = this.queue[i];
-          if (this.frame >= end) {
-            complete++;
-            output += to;
-          } else if (this.frame >= start) {
-            if (!char || Math.random() < 0.28) {
-              char = this.randomChar();
-              this.queue[i].char = char;
-            }
-            output += `<span style="opacity:0.8">${char}</span>`;
-          } else {
-            output += from;
-          }
-        }
-        this.el.innerHTML = output;
-        if (complete === this.queue.length) {
-          this.resolve();
-        } else {
-          this.frameRequest = requestAnimationFrame(this.update);
-          this.frame++;
-        }
-      }
-      randomChar() {
-        return this.chars[Math.floor(Math.random() * this.chars.length)];
-      }
-    }
-
-    // Start the scramble effect on the main heading
-    const scrambleEl = document.getElementById('scrambleText');
-    const fx = new TextScramble(scrambleEl);
-    fx.setText('BASIL ALOMARY');
+    // Update the custom cursor to follow the mouse
+    document.addEventListener("mousemove", function(e) {
+      const cursor = document.getElementById("custom-cursor");
+      cursor.style.left = e.clientX + "px";
+      cursor.style.top  = e.clientY + "px";
+    });
+    
+    // When the main text is clicked…
+    document.getElementById("text").addEventListener("click", function(e) {
+      // Start the vanish animation on the text
+      this.classList.add("clicked");
+      
+      // Get the click coordinates
+      const x = e.clientX;
+      const y = e.clientY;
+      
+      // Get the overlay element and set its clip-path center via CSS variables
+      const overlay = document.getElementById("overlay");
+      overlay.style.setProperty("--x", x + "px");
+      overlay.style.setProperty("--y", y + "px");
+      
+      // Display the overlay (using flex to center the message)
+      overlay.style.display = "flex";
+      
+      // Hide the custom cursor so it does not appear on top of the explosion
+      document.getElementById("custom-cursor").style.display = "none";
+      
+      // Force reflow so the animation restarts
+      void overlay.offsetWidth;
+      
+      // Add the "active" class to trigger the eruption animation
+      overlay.classList.add("active");
+    });
   </script>
 </body>
 </html>
