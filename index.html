@@ -3,128 +3,260 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interactive Typewriter & Letter Explosion Demo</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet" />
+  <title>Basil Alomary</title>
+  <!-- Import IBM Plex Sans from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Include GSAP (for explosion and other animations) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <!-- Include GSAP ScrollTrigger and SplitText -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/SplitText.min.js"></script>
   <style>
-    /* Basic Reset */
+    /* Global Reset & Base Styling */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'IBM Plex Sans', sans-serif;
-      background: #111;
-      color: #fff;
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #000;
       overflow-x: hidden;
+      font-family: 'IBM Plex Sans', sans-serif;
     }
-    /* First Screen: Typewriter Effect */
-    #first-screen {
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-    }
-    .typewriter {
-      font-size: 2.5rem;
+    /* Main "BASIL ALOMARY" Text (unchanged) */
+    #text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 20px;
       text-transform: uppercase;
       letter-spacing: 2px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      z-index: 1500;
     }
-    /* Custom Cursor */
+    #text.clicked {
+      animation: vanish 0.5s forwards;
+    }
+    @keyframes vanish {
+      to { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    }
+    /* Custom Pulsing Cursor */
     #custom-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 20px;
       height: 20px;
       background: #fff;
       border-radius: 50%;
+      border: none;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 2000;
+      transition: background 0.3s ease;
+    }
+    /* Explosion Overlay (unchanged) */
+    #overlay {
       position: fixed;
       top: 0;
       left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
       pointer-events: none;
-      z-index: 10000;
-      transform: translate(-50%, -50%);
-      transition: background 0.3s ease, transform 0.3s ease;
+      clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
     }
-    /* Second Screen: Info Section */
+    #overlay.active {
+      animation: erupt 0.8s forwards;
+    }
+    @keyframes erupt {
+      from { clip-path: circle(0% at var(--x, 50%) var(--y, 50%)); }
+      to { clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); }
+    }
+    /* Overlay Content (for bio text with typewriter effect) */
+    #overlay-content {
+      position: relative;
+      max-width: 600px;
+      width: 90%;
+      margin: 0 auto;
+      text-align: left;
+      font-size: 10px;
+      line-height: 1.4;
+      color: #000;
+    }
+    #overlay-normal a {
+      color: inherit;
+      text-decoration: underline;
+    }
+    /* Blinking Cursor for Typewriter Effect */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      background: currentColor;
+      animation: blink 1s step-end infinite;
+      vertical-align: bottom;
+      margin-left: 2px;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    /* Second Screen: New Section for Article Trigger */
     #second-screen {
       height: 100vh;
+      background: #333;
       display: flex;
-      justify-content: center;
       align-items: center;
-      background: #222;
-      position: relative;
-      padding: 20px;
+      justify-content: center;
       text-align: center;
+      padding: 20px;
     }
-    #infoParagraph {
+    #articleTrigger {
       font-size: 1.5rem;
-      max-width: 80%;
+      color: #fff;
       cursor: pointer;
-    }
-    /* Styling for Article Links (after reassembly) */
-    #infoParagraph p {
-      margin: 10px 0;
-    }
-    #infoParagraph a {
-      color: #00aced;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    #infoParagraph a:hover {
-      color: #1da1f2;
     }
   </style>
 </head>
 <body>
-  <!-- First Screen with Typewriter Animation -->
-  <div id="first-screen">
-    <span class="typewriter"></span>
-  </div>
-
-  <!-- Custom Cursor -->
+  <!-- Main Clickable Text (unchanged) -->
+  <div id="text">BASIL ALOMARY</div>
+  
+  <!-- Custom Pulsing Cursor -->
   <div id="custom-cursor"></div>
-
-  <!-- Second Screen with a Clickable Paragraph -->
-  <div id="second-screen">
-    <p id="infoParagraph">Click here to reveal my articles.</p>
+  
+  <!-- Explosion Overlay -->
+  <div id="overlay">
+    <div id="overlay-content">
+      <div id="overlay-normal"></div>
+    </div>
   </div>
-
-  <!-- External Libraries -->
-  <!-- Typed.js for typewriter effect -->
-  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.16"></script>
-  <!-- GSAP Core -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <!-- GSAP ScrollTrigger for scroll-based effects -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-  <!-- GSAP SplitText Plugin (assumed available for demo) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/SplitText.min.js"></script>
-
+  
+  <!-- Second Screen for Article Links Trigger -->
+  <div id="second-screen">
+    <p id="articleTrigger">Discover My Articles</p>
+  </div>
+  
   <script>
-    /* 1. Playful Typewriter Effect using Typed.js */
-    var typed = new Typed(".typewriter", {
-      strings: ["Student", "Master", "Light"],
-      typeSpeed: 80,      // relatively fast typing
-      backSpeed: 150,     // even faster backspacing
-      backDelay: 500,     // brief pause before deletion
-      startDelay: 300,
-      smartBackspace: false,
-      loop: true,
-      onStringTyped: function(arrayPos, self) {
-        // Introduce an intermittent pause after the second word ("Master")
-        if (arrayPos === 1) {
-          self.stop();
-          setTimeout(function() {
-            self.start();
-          }, 1000); // pause for 1 second
-        }
+    /********************
+     * GLOBAL VARIABLES & BIO TEXT (unchanged)
+     ********************/
+    const bioHTML = `I'm currently a Principal and the Head of Research &amp; Growth Strategy at <a href="https://stripes.co" target="_blank">Stripes</a>, a NY-based growth equity fund. I lead the team responsible for the diligence and evaluation of Stripes’ investments in consumer and enterprise companies. I also help support our portfolio of #amazing products.<br><br>Prior to Stripes, I spent time as a Consultant at <a href="https://bain.com" target="_blank">Bain</a> and as the VP of Growth at <a href="https://simondata.com" target="_blank">Simon Data</a>. Additionally, I've spent time as an early stage investor and advisor to several companies and funds.`;
+    
+    /********************
+     * PLAYFUL TYPEWRITER EFFECT FUNCTION
+     * (Modified randomDelay for a faster, slightly playful pace)
+     ********************/
+    function typeWriterEffect(element, text, index = 0, output = "") {
+      if (index >= text.length) {
+        element.innerHTML = output;
+        return;
       }
-    });
-
-    /* 2. Custom Cursor that follows the mouse */
+      if (text[index] === "<") {
+        let closeIndex = text.indexOf(">", index);
+        if (closeIndex === -1) closeIndex = index;
+        output += text.substring(index, closeIndex + 1);
+        element.innerHTML = output + '<span class="cursor">|</span>';
+        setTimeout(() => typeWriterEffect(element, text, closeIndex + 1, output), randomDelay());
+      } else {
+        output += text.charAt(index);
+        element.innerHTML = output + '<span class="cursor">|</span>';
+        setTimeout(() => typeWriterEffect(element, text, index + 1, output), randomDelay());
+      }
+    }
+    
+    function randomDelay() {
+      let delay = 30 + Math.random() * 70; // 30-100ms
+      if (Math.random() > 0.8) {
+        delay += 200; // occasional extra pause
+      }
+      return delay;
+    }
+    
+    /********************
+     * ORIGINAL CURSOR ANIMATION (pulsing)
+     ********************/
     const cursor = document.getElementById("custom-cursor");
-    document.addEventListener("mousemove", function(e) {
+    let cursorX = 0, cursorY = 0;
+    let startTime = performance.now();
+    const minScale = 0.5, maxScale = 2.5;
+    const pulsePeriod = 3;
+    function animateCursor() {
+      const now = performance.now();
+      const elapsed = (now - startTime) / 1000;
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const dx = cursorX - centerX;
+      const dy = cursorY - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
+      const normalizedDistance = distance / maxDistance;
+      const baseScale = minScale + (maxScale - minScale) * (1 - normalizedDistance);
+      const pulse = 0.5 * (Math.sin((2 * Math.PI / pulsePeriod) * elapsed) + 1);
+      const finalScale = baseScale * (1 + 0.3 * pulse);
+      cursor.style.transform = `translate(-50%, -50%) scale(${finalScale})`;
+      requestAnimationFrame(animateCursor);
+    }
+    document.addEventListener("mousemove", e => {
+      cursorX = e.clientX;
+      cursorY = e.clientY;
       cursor.style.left = e.clientX + "px";
-      cursor.style.top = e.clientY + "px";
+      cursor.style.top  = e.clientY + "px";
     });
-
-    /* 3. Transform the Cursor When Reaching Second Screen */
+    document.addEventListener("touchmove", e => {
+      cursorX = e.touches[0].clientX;
+      cursorY = e.touches[0].clientY;
+      cursor.style.left = e.touches[0].clientX + "px";
+      cursor.style.top  = e.touches[0].clientY + "px";
+    });
+    animateCursor();
+    
+    /********************
+     * EXPLOSION & ORIGINAL TYPEWRITER ANIMATION (unchanged)
+     ********************/
+    const textEl = document.getElementById("text");
+    textEl.addEventListener("click", triggerExplosion);
+    textEl.addEventListener("touchstart", triggerExplosion);
+    
+    function triggerExplosion(e) {
+      if (textEl.classList.contains("clicked")) return;
+      textEl.classList.add("clicked");
+      
+      let clientX, clientY;
+      if (e.type.startsWith("touch")) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+      
+      const overlay = document.getElementById("overlay");
+      overlay.style.setProperty("--x", clientX + "px");
+      overlay.style.setProperty("--y", clientY + "px");
+      overlay.style.display = "flex";
+      void overlay.offsetWidth;
+      overlay.classList.add("active");
+      
+      // Change cursor to solid black post-explosion.
+      cursor.style.background = "#000";
+      
+      const overlayNormal = document.getElementById("overlay-normal");
+      overlayNormal.innerHTML = "";
+      typeWriterEffect(overlayNormal, bioHTML);
+    }
+    
+    /********************
+     * CURSOR TRANSFORMATION ON SECOND SCREEN
+     * When the second screen enters view, morph the cursor into a new playful shape.
+     ********************/
     gsap.registerPlugin(ScrollTrigger);
     ScrollTrigger.create({
       trigger: "#second-screen",
@@ -148,13 +280,15 @@
         });
       }
     });
-
-    /* 4. Letter Explosion and Reassembly into Article Links */
-    const infoParagraph = document.getElementById("infoParagraph");
-    infoParagraph.addEventListener("click", function() {
-      // Use GSAP's SplitText to break the paragraph into individual characters.
-      var split = new SplitText(infoParagraph, { type: "chars" });
-      // Animate each character to scatter in random directions.
+    
+    /********************
+     * ARTICLE TRIGGER: LETTER EXPLOSION & REASSEMBLY INTO ARTICLE LINKS
+     * When the user clicks the article trigger text in the second screen, 
+     * break it into characters, scatter them, then reassemble as article links.
+     ********************/
+    const articleTrigger = document.getElementById("articleTrigger");
+    articleTrigger.addEventListener("click", function() {
+      var split = new SplitText(articleTrigger, { type: "chars" });
       gsap.to(split.chars, {
         duration: 1,
         x: () => gsap.utils.random(-200, 200),
@@ -164,16 +298,18 @@
         stagger: 0.02,
         ease: "power3.out"
       });
-      // After a delay, reassemble new content (article links)
       gsap.delayedCall(1.5, function() {
-        infoParagraph.innerHTML = `
-          <p><a href="https://www.forbes.com/sites/columbiabusinessschool/2020/10/04/why-investors-should-focus-more-on-the-infrastructure-supporting-the-ai-revolution/" target="_blank">Forbes | Why Investors Should Focus More On The Infrastructure Supporting The AI Revolution | 2020</a></p>
-          <p><a href="https://www.forbes.com/sites/columbiabusinessschool/2020/04/30/ok-boomer-how-aging-population-impact-real-estate-tech/#21fc8cdc3241" target="_blank">Forbes | Ok Boomer: How Aging Population Impact Real Estate Tech | 2020</a></p>
-          <p><a href="https://wire.insiderfinance.io/nfts-like-all-art-are-all-about-narrative-bc0bb5edd81" target="_blank">Insider Finance | NFTs: Like All Art, Are All About Narrative</a></p>
-          <p><a href="https://medium.com/thoughts-from-primary-venture-partners/the-future-of-insurtech-why-serving-policyholders-has-been-the-path-to-growth-for-so-many-320b2c2b76b6" target="_blank">Medium | The Future of Insurtech: Why Serving Policyholders Has Been The Path To Growth For So Many</a></p>
+        articleTrigger.innerHTML = `
+          <p><a href="https://www.forbes.com/sites/columbiabusinessschool/2020/10/04/why-investors-should-focus-more-on-the-infrastructure-supporting-the-ai-revolution/" target="_blank">
+          Forbes | Why Investors Should Focus More On The Infrastructure Supporting The AI Revolution | 2020</a></p>
+          <p><a href="https://www.forbes.com/sites/columbiabusinessschool/2020/04/30/ok-boomer-how-aging-population-impact-real-estate-tech/#21fc8cdc3241" target="_blank">
+          Forbes | Ok Boomer: How Aging Population Impact Real Estate Tech | 2020</a></p>
+          <p><a href="https://wire.insiderfinance.io/nfts-like-all-art-are-all-about-narrative-bc0bb5edd81" target="_blank">
+          Insider Finance | NFTs: Like All Art, Are All About Narrative</a></p>
+          <p><a href="https://medium.com/thoughts-from-primary-venture-partners/the-future-of-insurtech-why-serving-policyholders-has-been-the-path-to-growth-for-so-many-320b2c2b76b6" target="_blank">
+          Medium | The Future of Insurtech: Why Serving Policyholders Has Been The Path To Growth For So Many</a></p>
         `;
-        // Animate in the new paragraphs with a subtle upward fade
-        gsap.from("#infoParagraph p", {
+        gsap.from("#articleTrigger p", {
           duration: 0.8,
           opacity: 0,
           y: 20,
