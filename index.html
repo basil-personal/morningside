@@ -6,7 +6,7 @@
   <title>Basil Alomary</title>
   <!-- Import IBM Plex Sans from Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
-  <!-- Include GSAP from CDN (still available if you want to use it for other parts) -->
+  <!-- Include GSAP from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <style>
     /* Basic Reset and Global Styles */
@@ -21,7 +21,7 @@
       background: #000;
       overflow: hidden;
       font-family: 'IBM Plex Sans', sans-serif;
-      cursor: none; /* Hide default cursor */
+      cursor: none; /* Hide the default cursor */
     }
     /* Main Clickable Text */
     #text {
@@ -48,7 +48,7 @@
         transform: translate(-50%, -50%) scale(0.8);
       }
     }
-    /* Custom Cursor – No CSS animation here because we animate it in JavaScript */
+    /* Custom Cursor – A white circle that will pulse */
     #custom-cursor {
       position: fixed;
       top: 0;
@@ -74,7 +74,7 @@
       justify-content: center;
       z-index: 2000;
       pointer-events: none;
-      /* Start as a tiny circle at the click point */
+      /* Start as a tiny circle at the click/touch point */
       clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
     }
     /* Activate the eruption animation */
@@ -198,23 +198,35 @@
     // ---------------------------
     const cursor = document.getElementById("custom-cursor");
     let cursorX = 0, cursorY = 0;
-    // Variables for pulsing effect
-    const baseScale = 1;
-    const defaultAmplitude = 0.2; // default pulse amplitude
-    const frequency = 2 * Math.PI; // 1-second period (in radians/sec)
-    let startTime = performance.now();
     
-    // Update the cursor position on mouse move.
-    document.addEventListener("mousemove", function(e) {
-      cursorX = e.clientX;
-      cursorY = e.clientY;
-      cursor.style.left = e.clientX + "px";
-      cursor.style.top  = e.clientY + "px";
+    // Helper function to update the cursor position.
+    function updateCursorPosition(x, y) {
+      cursorX = x;
+      cursorY = y;
+      cursor.style.left = x + "px";
+      cursor.style.top = y + "px";
+    }
+    
+    // Listen for both mouse and touch events.
+    document.addEventListener("mousemove", (e) => {
+      updateCursorPosition(e.clientX, e.clientY);
+    });
+    document.addEventListener("touchstart", (e) => {
+      updateCursorPosition(e.touches[0].clientX, e.touches[0].clientY);
+    });
+    document.addEventListener("touchmove", (e) => {
+      updateCursorPosition(e.touches[0].clientX, e.touches[0].clientY);
     });
     
     // ---------------------------
     // Animation Loop for Dynamic Pulsing
     // ---------------------------
+    const baseScale = 1;
+    const defaultAmplitude = 0.2; // default pulse amplitude
+    // Use a slower frequency for pulsing (Math.PI gives a 2-second period instead of 1 second)
+    const frequency = Math.PI; 
+    let startTime = performance.now();
+    
     function animateCursor() {
       const now = performance.now();
       const elapsed = (now - startTime) / 1000; // in seconds
@@ -229,23 +241,22 @@
         centerY = rect.top + rect.height / 2;
       }
       
-      // Calculate the distance between the cursor and the main text center.
+      // Calculate the distance between the cursor and the center of the main text.
       const dx = cursorX - centerX;
       const dy = cursorY - centerY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       // Determine a multiplier for amplitude based on proximity.
-      // When far (>=200px), multiplier is 1.
-      // When closer than 200px, multiplier increases linearly up to 2 at 0 distance.
       let amplitudeMultiplier = 1;
       if (distance < 200) {
         amplitudeMultiplier = 1 + ((200 - distance) / 200);
       }
       
-      // Compute extra growth when extremely close (within 50px).
+      // Compute extra growth so the cursor becomes significantly larger as it nears the text.
+      // When within 200px, extraGrowth scales linearly up to an added 2.5.
       let extraGrowth = 0;
-      if (distance < 50) {
-        extraGrowth = (50 - distance) / 50 * 0.5;  // up to an extra 50% growth
+      if (distance < 200) {
+        extraGrowth = ((200 - distance) / 200) * 2.5;
       }
       
       // Calculate the current scale using a sine wave for pulsing.
@@ -258,24 +269,34 @@
       
       requestAnimationFrame(animateCursor);
     }
-    
-    // Start the pulsing animation loop.
     animateCursor();
     
     // --------------------------------------------------
-    // On Click: Vanish Main Text, Erupt Overlay, & Scramble Text
+    // On Click/Touch: Vanish Main Text, Erupt Overlay, & Scramble Text
     // --------------------------------------------------
-    document.getElementById("text").addEventListener("click", function(e) {
-      this.classList.add("clicked");
+    document.getElementById("text").addEventListener("click", triggerAnimation);
+    document.getElementById("text").addEventListener("touchstart", triggerAnimation);
+    
+    function triggerAnimation(e) {
+      // Prevent multiple triggers (especially on touch devices)
+      if (document.getElementById("text").classList.contains("clicked")) return;
       
-      // Get click coordinates for the eruption origin.
-      const x = e.clientX;
-      const y = e.clientY;
+      document.getElementById("text").classList.add("clicked");
+      
+      // Determine event type for coordinate extraction.
+      let clientX, clientY;
+      if (e.type.startsWith("touch")) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
       
       // Setup the overlay clip-path center and display it.
       const overlay = document.getElementById("overlay");
-      overlay.style.setProperty("--x", x + "px");
-      overlay.style.setProperty("--y", y + "px");
+      overlay.style.setProperty("--x", clientX + "px");
+      overlay.style.setProperty("--y", clientY + "px");
       overlay.style.display = "flex";
       
       // Hide the custom cursor.
@@ -296,7 +317,7 @@
           gsap.to("#black-fall", {duration: 1, top: 0, ease: "power2.inOut"});
         }, 2000); // 2-second pause after the text appears
       });
-    });
+    }
   </script>
 </body>
 </html>
