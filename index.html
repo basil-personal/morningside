@@ -9,7 +9,7 @@
   <!-- Include GSAP from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <style>
-    /* Basic Reset and Global Styles */
+    /* Global reset and styling */
     * {
       margin: 0;
       padding: 0;
@@ -17,38 +17,14 @@
     }
     html, body {
       width: 100%;
-      height: 100%;
+      min-height: 100%;
       background: #000;
-      overflow: hidden;
-      font-family: 'IBM Plex Sans', sans-serif;
-      cursor: none; /* Hide the default cursor */
-    }
-    /* Main Clickable Text */
-    #text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
       color: #fff;
-      font-size: 20px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      cursor: pointer;
-      user-select: none;
-      font-weight: bold;
-      transition: opacity 0.5s ease, transform 0.5s ease;
+      font-family: 'IBM Plex Sans', sans-serif;
+      overflow-x: hidden;
+      cursor: none; /* Custom cursor will be used */
     }
-    /* Fade-out Animation for Main Text */
-    #text.clicked {
-      animation: vanish 0.5s forwards;
-    }
-    @keyframes vanish {
-      to {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
-      }
-    }
-    /* Custom Cursor – A white circle that will pulse */
+    /* Custom cursor (same as before) */
     #custom-cursor {
       position: fixed;
       top: 0;
@@ -58,156 +34,163 @@
       background: #fff;
       border-radius: 50%;
       pointer-events: none;
-      transform: translate(-50%, -50%) scale(1);
+      transform: translate(-50%, -50%);
       z-index: 1000;
     }
-    /* Overlay for the Eruption Effect */
-    #overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #fff;
-      display: none; /* Initially hidden */
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      pointer-events: none;
-      /* Start as a tiny circle at the click/touch point */
-      clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
+    /* Header with Basil Alomary text */
+    #header {
+      position: relative;
+      text-align: center;
+      padding: 50px 0;
     }
-    /* Activate the eruption animation */
-    #overlay.active {
-      animation: erupt 0.8s forwards;
-    }
-    @keyframes erupt {
-      from {
-        clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
-      }
-      to {
-        clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
-      }
-    }
-    /* Overlay Text – Bold, All Caps */
-    #overlay-text {
-      font-size: 20px;
-      color: #000;
+    /* Smaller text on main page */
+    #header #text {
+      font-size: 16px;
       text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.5s ease, opacity 0.5s ease;
     }
-    /* Black Falling Screen Element */
-    #black-fall {
-      position: fixed;
-      top: -100%;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      z-index: 3000;
+    /* When clicked, no disappearing—but will be animated upward */
+    /* Main content (hidden initially) */
+    #main-content {
       display: none;
+      padding: 20px 10%;
+    }
+    #bio {
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 50px;
+    }
+    #bio a {
+      color: #fff;
+      text-decoration: underline;
+    }
+    /* Spacer (vertical breaks) */
+    .spacer {
+      height: 50px;
+    }
+    /* Articles section */
+    #articles-section {
+      margin-bottom: 50px;
+    }
+    #articles-section h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+    #articles-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .article {
+      position: relative;
+      transition: opacity 0.3s;
+    }
+    .article a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+      position: relative;
+      z-index: 1;
+    }
+    /* The description that appears on hover */
+    .article .description {
+      position: absolute;
+      left: 110%;
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+      color: #ccc;
+      z-index: 0;
+      padding-left: 10px;
+    }
+    /* When hovering on an article, show its description */
+    .article.hovered .description {
+      opacity: 1;
+    }
+    /* When an article is hovered, the others get grayed out */
+    .article.faded a {
+      opacity: 0.5;
+    }
+    /* Social links at bottom */
+    #social-links {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    #social-links a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+      margin: 0 10px;
+    }
+    /* Hide the custom cursor on touch devices if needed via media query (optional) */
+    @media (hover: none) and (pointer: coarse) {
+      #custom-cursor {
+        display: block;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Main Clickable Text -->
-  <div id="text">Basil Alomary</div>
-  
-  <!-- Custom Cursor Element -->
+  <!-- Custom Cursor -->
   <div id="custom-cursor"></div>
   
-  <!-- Fullscreen Overlay (for Eruption & Text Scramble) -->
-  <div id="overlay">
-    <div id="overlay-text"></div>
+  <!-- Header with clickable Basil Alomary text -->
+  <div id="header">
+    <div id="text">Basil Alomary</div>
   </div>
   
-  <!-- Black Falling Screen Element -->
-  <div id="black-fall"></div>
+  <!-- Main Content: Bio, Articles, Social Links -->
+  <div id="main-content">
+    <!-- Bio Paragraph -->
+    <p id="bio">
+      I'm currently a Principal and the Head of Research &amp; Growth Strategy at 
+      <a href="https://stripes.co" target="_blank">Stripes</a>, a NY-based growth equity fund. 
+      I lead the team responsible for the diligence and evaluation of Stripes’ investments in consumer and enterprise companies. 
+      I also help support our portfolio of #amazing products. 
+      <br><br>
+      Prior to Stripes, I spent time as a Consultant at 
+      <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> and as the VP of Growth at 
+      <a href="https://www.simondata.com" target="_blank">Simon Data</a>. Additionally, I've spent time as an early stage investor and advisor to several companies and funds.
+    </p>
+    
+    <div class="spacer"></div>
+    
+    <!-- Articles Section -->
+    <section id="articles-section">
+      <h2>Articles</h2>
+      <div id="articles-container">
+        <!-- Articles will be dynamically loaded here from Notion -->
+      </div>
+    </section>
+    
+    <div class="spacer"></div>
+    
+    <!-- Social Links -->
+    <div id="social-links">
+      <a href="https://www.linkedin.com/in/basilalomary" target="_blank">LinkedIn</a>
+      <a href="https://twitter.com/basil_alomary" target="_blank">Twitter</a>
+    </div>
+  </div>
   
   <script>
-    // --------------------------
-    // Text Scramble Effect Class
-    // --------------------------
-    class TextScramble {
-      constructor(el) {
-        this.el = el;
-        this.chars = '!<>-_\\/[]{}—=+*^?#________';
-        this.frameRequest = null;
-        this.frame = 0;
-        this.queue = [];
-        this.resolve = null;
-        // Multiplier to slow down scramble timing
-        this.multiplier = 5; 
-        this.update = this.update.bind(this);
-      }
-      
-      setText(newText) {
-        const oldText = this.el.innerText;
-        const length = Math.max(oldText.length, newText.length);
-        const promise = new Promise((resolve) => this.resolve = resolve);
-        this.queue = [];
-        for (let i = 0; i < length; i++) {
-          const from = oldText[i] || '';
-          const to = newText[i] || '';
-          // Random start and end times, multiplied to extend duration.
-          const start = Math.floor(Math.random() * 40 * this.multiplier);
-          const end = start + Math.floor(Math.random() * 40 * this.multiplier);
-          this.queue.push({ from, to, start, end, char: '' });
-        }
-        cancelAnimationFrame(this.frameRequest);
-        this.frame = 0;
-        this.update();
-        return promise;
-      }
-      
-      update() {
-        let output = '';
-        let complete = 0;
-        for (let i = 0; i < this.queue.length; i++) {
-          let { from, to, start, end, char } = this.queue[i];
-          if (this.frame >= end) {
-            complete++;
-            output += to;
-          } else if (this.frame >= start) {
-            if (!char || Math.random() < 0.28) {
-              char = this.randomChar();
-              this.queue[i].char = char;
-            }
-            output += `<span class="dud">${char}</span>`;
-          } else {
-            output += from;
-          }
-        }
-        this.el.innerHTML = output;
-        if (complete === this.queue.length) {
-          this.resolve();
-        } else {
-          this.frameRequest = requestAnimationFrame(this.update);
-          this.frame++;
-        }
-      }
-      
-      randomChar() {
-        return this.chars[Math.floor(Math.random() * this.chars.length)];
-      }
-    }
-    
-    // ---------------------------
-    // Custom Cursor – Position & Dynamic Pulse
-    // ---------------------------
+    /********************
+     * Custom Cursor
+     ********************/
     const cursor = document.getElementById("custom-cursor");
     let cursorX = 0, cursorY = 0;
-    
-    // Helper function to update the cursor position.
     function updateCursorPosition(x, y) {
       cursorX = x;
       cursorY = y;
       cursor.style.left = x + "px";
       cursor.style.top = y + "px";
     }
-    
-    // Listen for both mouse and touch events.
+    // Update on mouse and touch events.
     document.addEventListener("mousemove", (e) => {
       updateCursorPosition(e.clientX, e.clientY);
     });
@@ -218,106 +201,160 @@
       updateCursorPosition(e.touches[0].clientX, e.touches[0].clientY);
     });
     
-    // ---------------------------
-    // Animation Loop for Dynamic Pulsing
-    // ---------------------------
+    /********************
+     * Dynamic Pulsing Cursor (as before)
+     ********************/
     const baseScale = 1;
-    const defaultAmplitude = 0.2; // default pulse amplitude
-    // Use a slower frequency for pulsing (Math.PI gives a 2-second period instead of 1 second)
-    const frequency = Math.PI; 
+    const defaultAmplitude = 0.2;
+    // Slower pulsing: use frequency = Math.PI (2-second period)
+    const frequency = Math.PI;
     let startTime = performance.now();
     
     function animateCursor() {
       const now = performance.now();
-      const elapsed = (now - startTime) / 1000; // in seconds
+      const elapsed = (now - startTime) / 1000;
       
-      // Get the center position of the main text.
+      // Get the center of the Basil Alomary text (header)
       const textEl = document.getElementById("text");
-      let centerX = window.innerWidth / 2;
-      let centerY = window.innerHeight / 2;
-      if (textEl) {
-        const rect = textEl.getBoundingClientRect();
-        centerX = rect.left + rect.width / 2;
-        centerY = rect.top + rect.height / 2;
-      }
+      const rect = textEl.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
       
-      // Calculate the distance between the cursor and the center of the main text.
       const dx = cursorX - centerX;
       const dy = cursorY - centerY;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Determine a multiplier for amplitude based on proximity.
+      // Closer than 200px increases amplitude and extra growth.
       let amplitudeMultiplier = 1;
       if (distance < 200) {
         amplitudeMultiplier = 1 + ((200 - distance) / 200);
       }
       
-      // Compute extra growth so the cursor becomes significantly larger as it nears the text.
-      // When within 200px, extraGrowth scales linearly up to an added 2.5.
       let extraGrowth = 0;
       if (distance < 200) {
         extraGrowth = ((200 - distance) / 200) * 2.5;
       }
       
-      // Calculate the current scale using a sine wave for pulsing.
       const amplitude = defaultAmplitude * amplitudeMultiplier;
       const pulse = amplitude * Math.sin(elapsed * frequency);
       const scale = baseScale + pulse + extraGrowth;
       
-      // Apply the new scale (keeping the translate for centering)
       cursor.style.transform = `translate(-50%, -50%) scale(${scale})`;
-      
       requestAnimationFrame(animateCursor);
     }
     animateCursor();
     
-    // --------------------------------------------------
-    // On Click/Touch: Vanish Main Text, Erupt Overlay, & Scramble Text
-    // --------------------------------------------------
-    document.getElementById("text").addEventListener("click", triggerAnimation);
-    document.getElementById("text").addEventListener("touchstart", triggerAnimation);
+    /********************
+     * Header Click Animation
+     ********************/
+    const headerText = document.getElementById("text");
+    headerText.addEventListener("click", showContent);
+    headerText.addEventListener("touchstart", showContent);
+    let contentShown = false;
+    function showContent(e) {
+      if (contentShown) return;
+      contentShown = true;
+      
+      // Slide the header text upward (e.g., to 10% from the top)
+      gsap.to(headerText, {duration: 0.8, y: -window.innerHeight * 0.35, ease: "power2.inOut"});
+      
+      // Reveal the main content (fade it in)
+      const mainContent = document.getElementById("main-content");
+      setTimeout(() => {
+        mainContent.style.display = "block";
+        gsap.from(mainContent, {duration: 0.8, opacity: 0, ease: "power2.inOut"});
+      }, 800);
+    }
     
-    function triggerAnimation(e) {
-      // Prevent multiple triggers (especially on touch devices)
-      if (document.getElementById("text").classList.contains("clicked")) return;
+    /********************
+     * Load Articles from Notion
+     ********************/
+    function loadArticles() {
+      const notionURL = "https://basilalomary.notion.site/Basil-Alomary-d0308700122c48b6ac6d7e12b6b93018";
+      // Use AllOrigins as a proxy to bypass CORS
+      const fetchURL = "https://api.allorigins.hexocode.repl.co/get?disableCache=true&url=" + encodeURIComponent(notionURL);
       
-      document.getElementById("text").classList.add("clicked");
-      
-      // Determine event type for coordinate extraction.
-      let clientX, clientY;
-      if (e.type.startsWith("touch")) {
-        clientX = e.touches[0].clientX;
-        clientY = e.touches[0].clientY;
-      } else {
-        clientX = e.clientX;
-        clientY = e.clientY;
-      }
-      
-      // Setup the overlay clip-path center and display it.
-      const overlay = document.getElementById("overlay");
-      overlay.style.setProperty("--x", clientX + "px");
-      overlay.style.setProperty("--y", clientY + "px");
-      overlay.style.display = "flex";
-      
-      // Hide the custom cursor.
-      cursor.style.display = "none";
-      
-      // Force reflow to restart the eruption animation.
-      void overlay.offsetWidth;
-      overlay.classList.add("active");
-      
-      // Run the scramble effect on the overlay text.
-      const overlayText = document.getElementById("overlay-text");
-      const scramble = new TextScramble(overlayText);
-      scramble.setText("WE'LL BE BACK SOON").then(() => {
-        // After a short pause, animate the black falling screen.
-        setTimeout(() => {
-          const blackFall = document.getElementById("black-fall");
-          blackFall.style.display = "block";
-          gsap.to("#black-fall", {duration: 1, top: 0, ease: "power2.inOut"});
-        }, 2000); // 2-second pause after the text appears
+      fetch(fetchURL)
+        .then(response => response.json())
+        .then(data => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(data.contents, "text/html");
+          // Attempt to select article links.
+          // (Note: Adjust this query based on your Notion page’s structure.)
+          const linkElements = Array.from(doc.querySelectorAll("a"));
+          // Filter links that have non-empty text and an href that looks like an article.
+          const articles = linkElements.filter(link => {
+            const text = link.textContent.trim();
+            const href = link.href;
+            // Simple filter: text exists and href is not empty and not a generic navigation link.
+            return text && href && !href.includes("notion.so") && text.length > 3;
+          });
+          
+          const container = document.getElementById("articles-container");
+          container.innerHTML = "";
+          if (articles.length === 0) {
+            // Fallback: use placeholder articles
+            const placeholder = [
+              { title: "Example Article 1", href: "#", description: "A brief summary." },
+              { title: "Example Article 2", href: "#", description: "A brief summary." },
+              { title: "Example Article 3", href: "#", description: "A brief summary." }
+            ];
+            placeholder.forEach(item => {
+              const articleDiv = document.createElement("div");
+              articleDiv.className = "article";
+              articleDiv.innerHTML = `<a href="${item.href}" target="_blank">${item.title}</a>
+                                      <span class="description">${item.description}</span>`;
+              container.appendChild(articleDiv);
+            });
+          } else {
+            // For each article link, create an article element.
+            articles.forEach(link => {
+              const title = link.textContent.trim();
+              const href = link.href;
+              // For this demo, we use a placeholder description.
+              const description = "A brief summary.";
+              const articleDiv = document.createElement("div");
+              articleDiv.className = "article";
+              articleDiv.innerHTML = `<a href="${href}" target="_blank">${title}</a>
+                                      <span class="description">${description}</span>`;
+              container.appendChild(articleDiv);
+            });
+          }
+          addArticleHoverEffects();
+        })
+        .catch(err => {
+          console.error("Failed to load articles from Notion:", err);
+        });
+    }
+    
+    /********************
+     * Article Hover Effects
+     ********************/
+    function addArticleHoverEffects() {
+      const articles = document.querySelectorAll(".article");
+      articles.forEach(article => {
+        article.addEventListener("mouseenter", () => {
+          article.classList.add("hovered");
+          // Fade out other articles.
+          articles.forEach(other => {
+            if (other !== article) {
+              other.classList.add("faded");
+            }
+          });
+        });
+        article.addEventListener("mouseleave", () => {
+          article.classList.remove("hovered");
+          articles.forEach(other => {
+            other.classList.remove("faded");
+          });
+        });
       });
     }
+    
+    // Load articles once the main content is revealed.
+    // (Delay load until after the header click animation.)
+    setTimeout(loadArticles, 1200);
+    
   </script>
 </body>
 </html>
