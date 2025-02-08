@@ -159,7 +159,7 @@
     
     function randomDelay() {
       // Return a delay between 50ms and 200ms to mimic irregular typing.
-      return 50 + Math.random() * 150;
+      return 5 + Math.random() * 50;
     }
     
     /********************
@@ -169,8 +169,8 @@
     const cursor = document.getElementById("custom-cursor");
     let cursorX = 0, cursorY = 0;
     let startTime = performance.now();
-    const minScale = 0.5, maxScale = 2.5;
-    const pulsePeriod = 3; // seconds
+    const minScale = 0.5, maxScale = 4.5;
+    const pulsePeriod = 5; // seconds
     function animateCursor() {
       const now = performance.now();
       const elapsed = (now - startTime) / 1000;
