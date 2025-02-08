@@ -6,7 +6,7 @@
   <title>Basil Alomary</title>
   <!-- Import IBM Plex Sans from Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
-  <!-- Include GSAP from CDN -->
+  <!-- Include GSAP (for the explosion effect) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <style>
     /* Global reset and base styling */
@@ -47,7 +47,7 @@
       left: 0;
       width: 20px;
       height: 20px;
-      background: #fff;  /* initially white */
+      background: #fff; /* initially white */
       border-radius: 50%;
       border: none;
       pointer-events: none;
@@ -67,7 +67,7 @@
       justify-content: center;
       z-index: 1000;
       pointer-events: none;
-      /* Start with a tiny circle at click point */
+      /* Start as a tiny circle at the click point */
       clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
     }
     #overlay.active {
@@ -77,7 +77,7 @@
       from { clip-path: circle(0% at var(--x, 50%) var(--y, 50%)); }
       to { clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); }
     }
-    /* Bio text container: centered but text left-aligned, very small */
+    /* Bio text container – centered but with left-aligned text, very small font */
     #overlay-content {
       position: relative;
       max-width: 600px;
@@ -87,15 +87,27 @@
       font-size: 10px;
       line-height: 1.4;
       color: #000;
-      opacity: 0; /* will be animated in */
     }
-    /* Normal bio text layer: contains final HTML with working hyperlinks */
+    /* Normal bio text layer (where typewriter effect happens) */
     #overlay-normal {
       pointer-events: auto;
     }
     #overlay-normal a {
       color: inherit;
       text-decoration: underline;
+    }
+    /* Blinking cursor style for typewriter effect */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      background: currentColor;
+      animation: blink 1s step-end infinite;
+      vertical-align: bottom;
+      margin-left: 2px;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
   </style>
 </head>
@@ -119,39 +131,64 @@
      ********************/
     const bioHTML = `I'm currently a Principal and the Head of Research &amp; Growth Strategy at <a href="https://stripes.co" target="_blank">Stripes</a>, a NY-based growth equity fund. I lead the team responsible for the diligence and evaluation of Stripes’ investments in consumer and enterprise companies. I also help support our portfolio of #amazing products.<br><br>Prior to Stripes, I spent time as a Consultant at <a href="https://bain.com" target="_blank">Bain</a> and as the VP of Growth at <a href="https://simondata.com" target="_blank">Simon Data</a>. Additionally, I've spent time as an early stage investor and advisor to several companies and funds.`;
     
+    // For the typewriter effect, we want to process the HTML string,
+    // treating tags (e.g. <a ...>) as atomic units.
+    
     /********************
-     * CUSTOM PULSING CURSOR
-     * - Slower pulsing with a 3-second period.
-     * - Dynamic scaling based on distance from center: larger near center, smaller at periphery.
+     * TYPEWRITER EFFECT FUNCTION
+     ********************/
+    function typeWriterEffect(element, text, index = 0, output = "") {
+      if (index >= text.length) {
+        // Remove the blinking cursor at the end (optional)
+        element.innerHTML = output;
+        return;
+      }
+      // If the current character begins an HTML tag, append the entire tag at once.
+      if (text[index] === "<") {
+        let closeIndex = text.indexOf(">", index);
+        if (closeIndex === -1) closeIndex = index;
+        output += text.substring(index, closeIndex + 1);
+        element.innerHTML = output + '<span class="cursor">|</span>';
+        setTimeout(() => typeWriterEffect(element, text, closeIndex + 1, output), randomDelay());
+      } else {
+        output += text.charAt(index);
+        element.innerHTML = output + '<span class="cursor">|</span>';
+        setTimeout(() => typeWriterEffect(element, text, index + 1, output), randomDelay());
+      }
+    }
+    
+    function randomDelay() {
+      // Return a delay between 50ms and 200ms to mimic irregular typing.
+      return 50 + Math.random() * 150;
+    }
+    
+    /********************
+     * CUSTOM PULSING CURSOR (for overall page)
+     * - Slower pulsing (3-second period) with dynamic scaling based on distance from center.
      ********************/
     const cursor = document.getElementById("custom-cursor");
     let cursorX = 0, cursorY = 0;
     let startTime = performance.now();
-    // Define min and max scales based on viewport distance
     const minScale = 0.5, maxScale = 2.5;
     const pulsePeriod = 3; // seconds
     function animateCursor() {
       const now = performance.now();
       const elapsed = (now - startTime) / 1000;
-      // Determine cursor's distance from center of viewport
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
       const dx = cursorX - centerX;
       const dy = cursorY - centerY;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      const maxDistance = Math.sqrt(Math.pow(centerX,2) + Math.pow(centerY,2));
-      const normalizedDistance = distance / maxDistance; // 0 (center) to 1 (corner)
-      // Base scale: larger when closer to center, smaller when farther
+      const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
+      const normalizedDistance = distance / maxDistance; // 0 at center, 1 at corner
       const baseScale = minScale + (maxScale - minScale) * (1 - normalizedDistance);
-      // Slow pulsing factor (sine wave with period = pulsePeriod)
-      const pulse = 0.5 * (Math.sin((2 * Math.PI / pulsePeriod) * elapsed) + 1); // 0 to 1
-      // Final scale: modulate base scale by pulse (amplitude factor set to 0.3)
+      const pulse = 0.5 * (Math.sin((2 * Math.PI / pulsePeriod) * elapsed) + 1);
       const finalScale = baseScale * (1 + 0.3 * pulse);
       cursor.style.transform = `translate(-50%, -50%) scale(${finalScale})`;
       requestAnimationFrame(animateCursor);
     }
     
-    // Update cursor position on mouse and touch events
+    // Update cursor position on mouse/touch events
     document.addEventListener("mousemove", e => {
       cursorX = e.clientX;
       cursorY = e.clientY;
@@ -167,7 +204,7 @@
     animateCursor();
     
     /********************
-     * EXPLOSION & BIO DROP-IN ANIMATION
+     * EXPLOSION & TYPEWRITER ANIMATION
      ********************/
     const textEl = document.getElementById("text");
     textEl.addEventListener("click", triggerExplosion);
@@ -187,26 +224,21 @@
         clientY = e.clientY;
       }
       
-      // Activate the explosion overlay
+      // Activate explosion overlay
       const overlay = document.getElementById("overlay");
       overlay.style.setProperty("--x", clientX + "px");
       overlay.style.setProperty("--y", clientY + "px");
       overlay.style.display = "flex";
-      void overlay.offsetWidth; // trigger reflow
+      void overlay.offsetWidth; // force reflow
       overlay.classList.add("active");
       
-      // Change cursor to black immediately (solid, no outline)
+      // Change the custom cursor to solid black
       cursor.style.background = "#000";
       
-      // Populate the bio text into the overlay
+      // Clear the normal bio text container and start typewriter effect
       const overlayNormal = document.getElementById("overlay-normal");
-      overlayNormal.innerHTML = bioHTML;
-      
-      // Animate the drop-in of the bio text from above the viewport
-      const overlayContent = document.getElementById("overlay-content");
-      gsap.fromTo(overlayContent, 
-                    { y: "-100vh", opacity: 0 },
-                    { y: "0", opacity: 1, duration: 1, ease: "power2.out", delay: 0.5 });
+      overlayNormal.innerHTML = "";
+      typeWriterEffect(overlayNormal, bioHTML);
     }
   </script>
 </body>
