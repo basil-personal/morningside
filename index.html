@@ -6,7 +6,7 @@
   <title>Basil Alomary</title>
   <!-- Import IBM Plex Sans from Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
-  <!-- Include GSAP from CDN -->
+  <!-- Include GSAP from CDN (still available if you want to use it for other parts) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <style>
     /* Basic Reset and Global Styles */
@@ -48,7 +48,7 @@
         transform: translate(-50%, -50%) scale(0.8);
       }
     }
-    /* Custom Pulsing Cursor */
+    /* Custom Cursor – No CSS animation here because we animate it in JavaScript */
     #custom-cursor {
       position: fixed;
       top: 0;
@@ -58,14 +58,8 @@
       background: #fff;
       border-radius: 50%;
       pointer-events: none;
-      transform: translate(-50%, -50%);
-      animation: pulse 1.5s infinite;
+      transform: translate(-50%, -50%) scale(1);
       z-index: 1000;
-    }
-    @keyframes pulse {
-      0%   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
-      50%  { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
-      100% { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
     }
     /* Overlay for the Eruption Effect */
     #overlay {
@@ -114,39 +108,6 @@
       z-index: 3000;
       display: none;
     }
-    /* Cursor Trail Elements for Fantastical Motion Blur */
-    .cursor-trail {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 999;
-      transform: translate(-50%, -50%);
-    }
-    /* Different Radial Gradients for Off-White Shades */
-    #trail1 { 
-      background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%);
-      filter: blur(8px);
-    }
-    #trail2 { 
-      background: radial-gradient(circle, rgba(250,250,250,0.8) 0%, rgba(250,250,250,0) 60%);
-      filter: blur(8px);
-    }
-    #trail3 { 
-      background: radial-gradient(circle, rgba(245,245,245,0.8) 0%, rgba(245,245,245,0) 60%);
-      filter: blur(8px);
-    }
-    #trail4 { 
-      background: radial-gradient(circle, rgba(240,240,240,0.8) 0%, rgba(240,240,240,0) 60%);
-      filter: blur(8px);
-    }
-    #trail5 { 
-      background: radial-gradient(circle, rgba(235,235,235,0.8) 0%, rgba(235,235,235,0) 60%);
-      filter: blur(8px);
-    }
   </style>
 </head>
 <body>
@@ -155,13 +116,6 @@
   
   <!-- Custom Cursor Element -->
   <div id="custom-cursor"></div>
-  
-  <!-- Cursor Trail Elements for a Fantastical Motion Blur -->
-  <div class="cursor-trail" id="trail1"></div>
-  <div class="cursor-trail" id="trail2"></div>
-  <div class="cursor-trail" id="trail3"></div>
-  <div class="cursor-trail" id="trail4"></div>
-  <div class="cursor-trail" id="trail5"></div>
   
   <!-- Fullscreen Overlay (for Eruption & Text Scramble) -->
   <div id="overlay">
@@ -240,21 +194,73 @@
     }
     
     // ---------------------------
-    // Cursor & Trail Mouse Follow
+    // Custom Cursor – Position & Dynamic Pulse
     // ---------------------------
+    const cursor = document.getElementById("custom-cursor");
+    let cursorX = 0, cursorY = 0;
+    // Variables for pulsing effect
+    const baseScale = 1;
+    const defaultAmplitude = 0.2; // default pulse amplitude
+    const frequency = 2 * Math.PI; // 1-second period (in radians/sec)
+    let startTime = performance.now();
+    
+    // Update the cursor position on mouse move.
     document.addEventListener("mousemove", function(e) {
-      // Update the main custom cursor position
-      const cursor = document.getElementById("custom-cursor");
+      cursorX = e.clientX;
+      cursorY = e.clientY;
       cursor.style.left = e.clientX + "px";
       cursor.style.top  = e.clientY + "px";
-      
-      // Use GSAP to animate the trailing elements with slight delays for a smooth motion-blur effect
-      gsap.to("#trail1", {duration: 0.2, x: e.clientX, y: e.clientY});
-      gsap.to("#trail2", {duration: 0.3, x: e.clientX, y: e.clientY});
-      gsap.to("#trail3", {duration: 0.4, x: e.clientX, y: e.clientY});
-      gsap.to("#trail4", {duration: 0.5, x: e.clientX, y: e.clientY});
-      gsap.to("#trail5", {duration: 0.6, x: e.clientX, y: e.clientY});
     });
+    
+    // ---------------------------
+    // Animation Loop for Dynamic Pulsing
+    // ---------------------------
+    function animateCursor() {
+      const now = performance.now();
+      const elapsed = (now - startTime) / 1000; // in seconds
+      
+      // Get the center position of the main text.
+      const textEl = document.getElementById("text");
+      let centerX = window.innerWidth / 2;
+      let centerY = window.innerHeight / 2;
+      if (textEl) {
+        const rect = textEl.getBoundingClientRect();
+        centerX = rect.left + rect.width / 2;
+        centerY = rect.top + rect.height / 2;
+      }
+      
+      // Calculate the distance between the cursor and the main text center.
+      const dx = cursorX - centerX;
+      const dy = cursorY - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      // Determine a multiplier for amplitude based on proximity.
+      // When far (>=200px), multiplier is 1.
+      // When closer than 200px, multiplier increases linearly up to 2 at 0 distance.
+      let amplitudeMultiplier = 1;
+      if (distance < 200) {
+        amplitudeMultiplier = 1 + ((200 - distance) / 200);
+      }
+      
+      // Compute extra growth when extremely close (within 50px).
+      let extraGrowth = 0;
+      if (distance < 50) {
+        extraGrowth = (50 - distance) / 50 * 0.5;  // up to an extra 50% growth
+      }
+      
+      // Calculate the current scale using a sine wave for pulsing.
+      const amplitude = defaultAmplitude * amplitudeMultiplier;
+      const pulse = amplitude * Math.sin(elapsed * frequency);
+      const scale = baseScale + pulse + extraGrowth;
+      
+      // Apply the new scale (keeping the translate for centering)
+      cursor.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      
+      requestAnimationFrame(animateCursor);
+    }
+    
+    // Start the pulsing animation loop.
+    animateCursor();
     
     // --------------------------------------------------
     // On Click: Vanish Main Text, Erupt Overlay, & Scramble Text
@@ -272,9 +278,8 @@
       overlay.style.setProperty("--y", y + "px");
       overlay.style.display = "flex";
       
-      // Hide the custom cursor and its trails.
-      document.getElementById("custom-cursor").style.display = "none";
-      document.querySelectorAll(".cursor-trail").forEach(trail => trail.style.display = "none");
+      // Hide the custom cursor.
+      cursor.style.display = "none";
       
       // Force reflow to restart the eruption animation.
       void overlay.offsetWidth;
@@ -284,7 +289,7 @@
       const overlayText = document.getElementById("overlay-text");
       const scramble = new TextScramble(overlayText);
       scramble.setText("WE'LL BE BACK SOON").then(() => {
-        // After the scramble effect completes, wait a short pause then animate the falling black screen.
+        // After a short pause, animate the black falling screen.
         setTimeout(() => {
           const blackFall = document.getElementById("black-fall");
           blackFall.style.display = "block";
