@@ -13,11 +13,10 @@
       width: 100%;
       height: 100%;
       background: #000;
-      color: #fff;
-      font-family: 'IBM Plex Sans', sans-serif;
       overflow: hidden;
+      font-family: 'IBM Plex Sans', sans-serif;
     }
-    /* Main Text (BASIL ALOMARY) */
+    /* Main "BASIL ALOMARY" Text */
     #text {
       position: absolute;
       top: 50%;
@@ -27,9 +26,11 @@
       text-transform: uppercase;
       letter-spacing: 2px;
       font-weight: bold;
+      color: #fff;
       cursor: pointer;
       user-select: none;
       transition: opacity 0.5s ease, transform 0.5s ease;
+      z-index: 1500;
     }
     #text.clicked {
       animation: vanish 0.5s forwards;
@@ -37,7 +38,7 @@
     @keyframes vanish {
       to { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
     }
-    /* Custom Cursor */
+    /* Custom Pulsing Cursor (initially white, but will turn black after explosion) */
     #custom-cursor {
       position: fixed;
       top: 0;
@@ -48,15 +49,9 @@
       border-radius: 50%;
       pointer-events: none;
       transform: translate(-50%, -50%);
-      z-index: 1000;
-      animation: pulse 1.5s infinite;
+      z-index: 2000;
     }
-    @keyframes pulse {
-      0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      50%  { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
-      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    }
-    /* Overlay for Explosion Effect */
+    /* Explosion Overlay */
     #overlay {
       position: fixed;
       top: 0;
@@ -64,12 +59,12 @@
       width: 100%;
       height: 100%;
       background: #fff;
-      display: none;
+      display: none; /* Initially hidden */
       align-items: center;
       justify-content: center;
-      z-index: 2000;
+      z-index: 1000;
       pointer-events: none;
-      /* Start as a tiny circle at click/touch point */
+      /* Explosion effect starts as a tiny circle */
       clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
     }
     #overlay.active {
@@ -79,17 +74,34 @@
       from { clip-path: circle(0% at var(--x, 50%) var(--y, 50%)); }
       to { clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); }
     }
-    /* Overlay Text – Your Bio/Description */
-    #overlay-text {
-      font-size: 16px;
-      color: #000;
-      max-width: 80%;
-      text-align: center;
-      line-height: 1.5;
+    /* Overlay Content Container */
+    #overlay-content {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: left;
+      font-size: 12px; /* Much smaller text */
+      line-height: 1.4;
     }
-    /* Style links inside the description */
-    #overlay-text a {
+    /* The normal (bottom) text layer: black text */
+    #overlay-normal {
       color: #000;
+    }
+    /* The inverted (top) text layer: white text, masked by a clip-path */
+    #overlay-inverted {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      color: #fff;
+      /* Start with an empty clip-path (no area revealed) */
+      clip-path: circle(0px at 0px 0px);
+    }
+    /* Ensure links inside bio work normally */
+    #overlay-normal a, #overlay-inverted a {
+      color: inherit;
       text-decoration: underline;
     }
   </style>
@@ -103,104 +115,91 @@
   
   <!-- Explosion Overlay -->
   <div id="overlay">
-    <div id="overlay-text"></div>
+    <div id="overlay-content">
+      <div id="overlay-normal"></div>
+      <div id="overlay-inverted"></div>
+    </div>
   </div>
   
   <script>
     /********************
-     * Text Scramble Effect
+     * Global Variables & Bio Text
      ********************/
-    class TextScramble {
-      constructor(el) {
-        this.el = el;
-        this.chars = '!<>-_\\/[]{}—=+*^?#________';
-        this.frameRequest = null;
-        this.frame = 0;
-        this.queue = [];
-        this.resolve = null;
-        // Lower multiplier for a faster scramble effect.
-        this.multiplier = 2; 
-        this.update = this.update.bind(this);
-      }
-      
-      setText(newText) {
-        const oldText = this.el.innerText;
-        const length = Math.max(oldText.length, newText.length);
-        const promise = new Promise((resolve) => this.resolve = resolve);
-        this.queue = [];
-        for (let i = 0; i < length; i++) {
-          const from = oldText[i] || '';
-          const to = newText[i] || '';
-          // Use the reduced multiplier for faster start and end times.
-          const start = Math.floor(Math.random() * 40 * this.multiplier);
-          const end = start + Math.floor(Math.random() * 40 * this.multiplier);
-          this.queue.push({ from, to, start, end, char: '' });
-        }
-        cancelAnimationFrame(this.frameRequest);
-        this.frame = 0;
-        this.update();
-        return promise;
-      }
-      
-      update() {
-        let output = '';
-        let complete = 0;
-        for (let i = 0; i < this.queue.length; i++) {
-          let { from, to, start, end, char } = this.queue[i];
-          if (this.frame >= end) {
-            complete++;
-            output += to;
-          } else if (this.frame >= start) {
-            if (!char || Math.random() < 0.28) {
-              char = this.randomChar();
-              this.queue[i].char = char;
-            }
-            output += `<span class="dud">${char}</span>`;
-          } else {
-            output += from;
-          }
-        }
-        this.el.innerHTML = output;
-        if (complete === this.queue.length) {
-          this.resolve();
-        } else {
-          this.frameRequest = requestAnimationFrame(this.update);
-          this.frame++;
-        }
-      }
-      
-      randomChar() {
-        return this.chars[Math.floor(Math.random() * this.chars.length)];
-      }
-    }
+    const bioText = `I'm currently a Principal and the Head of Research &amp; Growth Strategy at <a href="https://stripes.co" target="_blank">Stripes</a>, a NY-based growth equity fund. I lead the team responsible for the diligence and evaluation of Stripes’ investments in consumer and enterprise companies. I also help support our portfolio of #amazing products.<br><br>Prior to Stripes, I spent time as a Consultant at <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> and as the VP of Growth at <a href="https://www.simondata.com" target="_blank">Simon Data</a>. Additionally, I've spent time as an early stage investor and advisor to several companies and funds.`;
+    
+    // We'll store the current cursor scale so we know the effective radius.
+    let currentCursorScale = 1;
+    // We'll track the cursor's position in viewport coordinates.
+    let cursorX = 0, cursorY = 0;
     
     /********************
-     * Custom Cursor Positioning
+     * Custom Cursor Animation (Big, Growing, Pulsing)
+     * Using a sine wave for constant pulsing.
      ********************/
     const cursor = document.getElementById("custom-cursor");
+    // Turn the cursor black after explosion is triggered.
+    let cursorIsBlack = false;
+    let startTime = performance.now();
+    
+    function animateCursor() {
+      const now = performance.now();
+      const elapsed = (now - startTime) / 1000; // in seconds
+      // Pulse between 1 and 2 (scale factor)
+      const pulse = 0.5 * (Math.sin(2 * Math.PI * elapsed) + 1); // ranges 0..1
+      const scale = 1 + pulse;  // scale ranges 1 to 2
+      currentCursorScale = scale;
+      cursor.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      
+      // If overlay is active, update the clip-path on the inverted text layer.
+      if (document.getElementById("overlay").style.display !== "none") {
+        updateInvertedClip();
+      }
+      requestAnimationFrame(animateCursor);
+    }
+    
+    // Update the clip-path of the inverted text layer so that it shows a circle 
+    // (centered at the cursor's position relative to the overlay-content).
+    function updateInvertedClip() {
+      const invertedLayer = document.getElementById("overlay-inverted");
+      const content = document.getElementById("overlay-content");
+      const rect = content.getBoundingClientRect();
+      // Compute cursor position relative to overlay-content.
+      const relativeX = cursorX - rect.left;
+      const relativeY = cursorY - rect.top;
+      // Determine the effective radius of the cursor (base 20px, half width, times scale, times factor).
+      const effectiveRadius = (20 * currentCursorScale / 2) * 1.5; // adjust factor as desired
+      invertedLayer.style.clipPath = `circle(${effectiveRadius}px at ${relativeX}px ${relativeY}px)`;
+    }
+    
+    // Update cursor position on mouse/touch move.
     document.addEventListener("mousemove", e => {
+      cursorX = e.clientX;
+      cursorY = e.clientY;
       cursor.style.left = e.clientX + "px";
       cursor.style.top  = e.clientY + "px";
     });
     document.addEventListener("touchmove", e => {
+      cursorX = e.touches[0].clientX;
+      cursorY = e.touches[0].clientY;
       cursor.style.left = e.touches[0].clientX + "px";
       cursor.style.top  = e.touches[0].clientY + "px";
     });
     
-    /********************
-     * Click / Touch: Trigger Explosion & Scramble Bio
-     ********************/
-    document.getElementById("text").addEventListener("click", triggerAnimation);
-    document.getElementById("text").addEventListener("touchstart", triggerAnimation);
+    animateCursor();
     
-    function triggerAnimation(e) {
-      // Prevent multiple triggers
-      const textEl = document.getElementById("text");
+    /********************
+     * Explosion & Reveal Animation on Click/Touch
+     ********************/
+    const textEl = document.getElementById("text");
+    textEl.addEventListener("click", triggerExplosion);
+    textEl.addEventListener("touchstart", triggerExplosion);
+    
+    function triggerExplosion(e) {
+      // Prevent multiple triggers.
       if (textEl.classList.contains("clicked")) return;
-      
       textEl.classList.add("clicked");
       
-      // Get click/touch coordinates
+      // Get the click/touch coordinates.
       let clientX, clientY;
       if (e.type.startsWith("touch")) {
         clientX = e.touches[0].clientX;
@@ -210,25 +209,22 @@
         clientY = e.clientY;
       }
       
-      // Set overlay explosion origin and display it
+      // Activate the explosion overlay.
       const overlay = document.getElementById("overlay");
       overlay.style.setProperty("--x", clientX + "px");
       overlay.style.setProperty("--y", clientY + "px");
       overlay.style.display = "flex";
-      
-      // Hide the custom cursor
-      cursor.style.display = "none";
-      
-      // Restart explosion animation
+      // Restart explosion animation.
       void overlay.offsetWidth;
       overlay.classList.add("active");
       
-      // Set the bio/description text with hyperlinks (HTML is preserved)
-      const bioText = `I'm currently a Principal and the Head of Research &amp; Growth Strategy at <a href="https://stripes.co" target="_blank">Stripes</a>, a NY-based growth equity fund. I lead the team responsible for the diligence and evaluation of Stripes’ investments in consumer and enterprise companies. I also help support our portfolio of #amazing products.<br><br>Prior to Stripes, I spent time as a Consultant at <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> and as the VP of Growth at <a href="https://www.simondata.com" target="_blank">Simon Data</a>. Additionally, I've spent time as an early stage investor and advisor to several companies and funds.`;
+      // Change the custom cursor to black.
+      cursor.style.background = "#000";
+      cursorIsBlack = true;
       
-      const overlayText = document.getElementById("overlay-text");
-      const scramble = new TextScramble(overlayText);
-      scramble.setText(bioText);
+      // Set the bio text immediately (no scramble effect) in both layers.
+      document.getElementById("overlay-normal").innerHTML = bioText;
+      document.getElementById("overlay-inverted").innerHTML = bioText;
     }
   </script>
 </body>
