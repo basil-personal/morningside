@@ -129,9 +129,10 @@
     /********************
      * GLOBAL VARIABLES & BIO TEXT
      ********************/
-    const bioHTML = I'm currently a Principal and the Head of Research &amp; Growth Strategy at <a href="https://stripes.co" target="_blank">Stripes</a>, a NY-based growth equity fund. I lead the team responsible for the diligence and evaluation of Stripes’ investments in consumer and enterprise companies. I also help support our portfolio of #amazingproducts.<br><br>Prior to Stripes, I spent time as a Consultant at <a href="https://bain.com" target="_blank">Bain</a> and as the VP of Growth at <a href="https://simondata.com" target="_blank">Simon Data</a>. Additionally, I've spent time as an early stage investor and advisor to several companies and funds.;
+    const bioHTML = I'm currently a Principal and the Head of Research &amp; Growth Strategy at <a href="https://stripes.co" target="_blank">Stripes</a>, a NY-based growth equity fund. I lead the team responsible for the diligence and evaluation of Stripes’ investments in consumer and enterprise companies. I also help support our portfolio of #amazing products.<br><br>Prior to Stripes, I spent time as a Consultant at <a href="https://bain.com" target="_blank">Bain</a> and as the VP of Growth at <a href="https://simondata.com" target="_blank">Simon Data</a>. Additionally, I've spent time as an early stage investor and advisor to several companies and funds.;
     
-
+    // For the typewriter effect, we want to process the HTML string,
+    // treating tags (e.g. <a ...>) as atomic units.
     
     /********************
      * TYPEWRITER EFFECT FUNCTION
@@ -235,9 +236,9 @@
       cursor.style.background = "#000";
       
       // Clear the normal bio text container and start typewriter effect
-     // const overlayNormal = document.getElementById("overlay-normal");
-     // overlayNormal.innerHTML = "";
-    //  typeWriterEffect(overlayNormal, bioHTML);
+      const overlayNormal = document.getElementById("overlay-normal");
+      overlayNormal.innerHTML = "";
+      typeWriterEffect(overlayNormal, bioHTML);
     }
   </script>
 </body>
