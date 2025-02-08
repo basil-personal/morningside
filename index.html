@@ -6,8 +6,10 @@
   <title>Basil Alomary</title>
   <!-- Import IBM Plex Sans from Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Include GSAP from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <style>
-    /* Basic reset and settings */
+    /* Basic Reset and Global Styles */
     * {
       margin: 0;
       padding: 0;
@@ -19,9 +21,9 @@
       background: #000;
       overflow: hidden;
       font-family: 'IBM Plex Sans', sans-serif;
-      cursor: none; /* hide default cursor */
+      cursor: none; /* Hide default cursor */
     }
-    /* Main clickable text */
+    /* Main Clickable Text */
     #text {
       position: absolute;
       top: 50%;
@@ -36,7 +38,7 @@
       font-weight: bold;
       transition: opacity 0.5s ease, transform 0.5s ease;
     }
-    /* Fade-out animation for the main text */
+    /* Fade-out Animation for Main Text */
     #text.clicked {
       animation: vanish 0.5s forwards;
     }
@@ -46,7 +48,7 @@
         transform: translate(-50%, -50%) scale(0.8);
       }
     }
-    /* Custom pulsing cursor */
+    /* Custom Pulsing Cursor */
     #custom-cursor {
       position: fixed;
       top: 0;
@@ -65,7 +67,7 @@
       50%  { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
       100% { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
     }
-    /* Overlay for the eruption effect */
+    /* Overlay for the Eruption Effect */
     #overlay {
       position: fixed;
       top: 0;
@@ -73,7 +75,7 @@
       width: 100%;
       height: 100%;
       background: #fff;
-      display: none;  /* initially hidden */
+      display: none; /* Initially hidden */
       align-items: center;
       justify-content: center;
       z-index: 2000;
@@ -81,7 +83,7 @@
       /* Start as a tiny circle at the click point */
       clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
     }
-    /* When activated, run the eruption animation */
+    /* Activate the eruption animation */
     #overlay.active {
       animation: erupt 0.8s forwards;
     }
@@ -93,7 +95,7 @@
         clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
       }
     }
-    /* Overlay text – bold and all caps */
+    /* Overlay Text – Bold, All Caps */
     #overlay-text {
       font-size: 20px;
       color: #000;
@@ -101,27 +103,77 @@
       letter-spacing: 2px;
       font-weight: bold;
     }
-    /* Optional style for scrambled (dud) characters */
-    .dud {
-      opacity: 0.8;
+    /* Black Falling Screen Element */
+    #black-fall {
+      position: fixed;
+      top: -100%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 3000;
+      display: none;
+    }
+    /* Cursor Trail Elements for Fantastical Motion Blur */
+    .cursor-trail {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 999;
+      transform: translate(-50%, -50%);
+    }
+    /* Different Radial Gradients for Off-White Shades */
+    #trail1 { 
+      background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%);
+      filter: blur(8px);
+    }
+    #trail2 { 
+      background: radial-gradient(circle, rgba(250,250,250,0.8) 0%, rgba(250,250,250,0) 60%);
+      filter: blur(8px);
+    }
+    #trail3 { 
+      background: radial-gradient(circle, rgba(245,245,245,0.8) 0%, rgba(245,245,245,0) 60%);
+      filter: blur(8px);
+    }
+    #trail4 { 
+      background: radial-gradient(circle, rgba(240,240,240,0.8) 0%, rgba(240,240,240,0) 60%);
+      filter: blur(8px);
+    }
+    #trail5 { 
+      background: radial-gradient(circle, rgba(235,235,235,0.8) 0%, rgba(235,235,235,0) 60%);
+      filter: blur(8px);
     }
   </style>
 </head>
 <body>
-  <!-- Main clickable text -->
+  <!-- Main Clickable Text -->
   <div id="text">Basil Alomary</div>
   
-  <!-- Custom cursor element -->
+  <!-- Custom Cursor Element -->
   <div id="custom-cursor"></div>
   
-  <!-- Fullscreen overlay that erupts on click -->
+  <!-- Cursor Trail Elements for a Fantastical Motion Blur -->
+  <div class="cursor-trail" id="trail1"></div>
+  <div class="cursor-trail" id="trail2"></div>
+  <div class="cursor-trail" id="trail3"></div>
+  <div class="cursor-trail" id="trail4"></div>
+  <div class="cursor-trail" id="trail5"></div>
+  
+  <!-- Fullscreen Overlay (for Eruption & Text Scramble) -->
   <div id="overlay">
     <div id="overlay-text"></div>
   </div>
   
+  <!-- Black Falling Screen Element -->
+  <div id="black-fall"></div>
+  
   <script>
     // --------------------------
-    // Text scramble effect class
+    // Text Scramble Effect Class
     // --------------------------
     class TextScramble {
       constructor(el) {
@@ -131,7 +183,7 @@
         this.frame = 0;
         this.queue = [];
         this.resolve = null;
-        // Multiplier to slow down the scramble timings.
+        // Multiplier to slow down scramble timing
         this.multiplier = 5; 
         this.update = this.update.bind(this);
       }
@@ -187,52 +239,58 @@
       }
     }
     
-    // -------------------------------------
-    // Update custom cursor to follow mouse
-    // -------------------------------------
+    // ---------------------------
+    // Cursor & Trail Mouse Follow
+    // ---------------------------
     document.addEventListener("mousemove", function(e) {
+      // Update the main custom cursor position
       const cursor = document.getElementById("custom-cursor");
       cursor.style.left = e.clientX + "px";
       cursor.style.top  = e.clientY + "px";
+      
+      // Use GSAP to animate the trailing elements with slight delays for a smooth motion-blur effect
+      gsap.to("#trail1", {duration: 0.2, x: e.clientX, y: e.clientY});
+      gsap.to("#trail2", {duration: 0.3, x: e.clientX, y: e.clientY});
+      gsap.to("#trail3", {duration: 0.4, x: e.clientX, y: e.clientY});
+      gsap.to("#trail4", {duration: 0.5, x: e.clientX, y: e.clientY});
+      gsap.to("#trail5", {duration: 0.6, x: e.clientX, y: e.clientY});
     });
     
     // --------------------------------------------------
-    // On click: vanish main text, erupt overlay, and run scramble
+    // On Click: Vanish Main Text, Erupt Overlay, & Scramble Text
     // --------------------------------------------------
     document.getElementById("text").addEventListener("click", function(e) {
       this.classList.add("clicked");
       
-      // Get the click coordinates for the eruption origin.
+      // Get click coordinates for the eruption origin.
       const x = e.clientX;
       const y = e.clientY;
       
-      // Setup the overlay and its clip-path center.
+      // Setup the overlay clip-path center and display it.
       const overlay = document.getElementById("overlay");
       overlay.style.setProperty("--x", x + "px");
       overlay.style.setProperty("--y", y + "px");
       overlay.style.display = "flex";
       
-      // Hide the custom cursor.
+      // Hide the custom cursor and its trails.
       document.getElementById("custom-cursor").style.display = "none";
+      document.querySelectorAll(".cursor-trail").forEach(trail => trail.style.display = "none");
       
-      // Force reflow so the eruption animation restarts.
+      // Force reflow to restart the eruption animation.
       void overlay.offsetWidth;
       overlay.classList.add("active");
       
-      // Trigger the scramble effect on the overlay text.
+      // Run the scramble effect on the overlay text.
       const overlayText = document.getElementById("overlay-text");
       const scramble = new TextScramble(overlayText);
-      scramble.setText("WE'LL BE BACK SOON");
-      
-      // After 10 seconds, fade out the overlay and open LinkedIn in a new tab.
-      setTimeout(() => {
-        overlay.style.transition = "opacity 0.5s ease";
-        overlay.style.opacity = "0";
+      scramble.setText("WE'LL BE BACK SOON").then(() => {
+        // After the scramble effect completes, wait a short pause then animate the falling black screen.
         setTimeout(() => {
-          overlay.style.display = "none";
-          window.open("https://www.linkedin.com/in/basilalomary", "_blank");
-        }, 500);
-      }, 10000);
+          const blackFall = document.getElementById("black-fall");
+          blackFall.style.display = "block";
+          gsap.to("#black-fall", {duration: 1, top: 0, ease: "power2.inOut"});
+        }, 2000); // 2-second pause after the text appears
+      });
     });
   </script>
 </body>
