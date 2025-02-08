@@ -1,28 +1,187 @@
-// When the user clicks (make sure to bind this to your desired click area)
-document.getElementById("triggerExplosion").addEventListener("click", function() {
-  // Split text into characters using SplitText (ensure the plugin is loaded)
-  var split = new SplitText("#infoParagraph", { type: "chars" });
-  
-  // Animate letters offscreen randomly
-  gsap.to(split.chars, {
-    duration: 1,
-    x: () => gsap.utils.random(-200, 200),
-    y: () => gsap.utils.random(-200, 200),
-    opacity: 0,
-    stagger: 0.02,
-    ease: "power3.out"
-  });
-  
-  // After the explosion, reassemble the new text
-  gsap.delayedCall(1.5, function() {
-    // Replace the paragraph with new HTML that contains your article links
-    document.getElementById("infoParagraph").innerHTML = `
-      <p><a href="https://www.forbes.com/sites/columbiabusinessschool/2020/10/04/why-investors-should-focus-more-on-the-infrastructure-supporting-the-ai-revolution/" target="_blank">Forbes | Why Investors Should Focus More On The Infrastructure Supporting The AI Revolution | 2020</a></p>
-      <p><a href="https://www.forbes.com/sites/columbiabusinessschool/2020/04/30/ok-boomer-how-aging-population-impact-real-estate-tech/#21fc8cdc3241" target="_blank">Forbes | Ok Boomer: How Aging Population Impact Real Estate Tech | 2020</a></p>
-      <p><a href="https://wire.insiderfinance.io/nfts-like-all-art-are-all-about-narrative-bc0bb5edd81" target="_blank">Insider Finance | NFTs: Like All Art, Are All About Narrative</a></p>
-      <p><a href="https://medium.com/thoughts-from-primary-venture-partners/the-future-of-insurtech-why-serving-policyholders-has-been-the-path-to-growth-for-so-many-320b2c2b76b6" target="_blank">Medium | The Future of Insurtech: Why Serving Policyholders Has Been the Path to Growth For So Many</a></p>
-    `;
-    // Optionally animate the new elements in for a final reveal
-    gsap.from("#infoParagraph p", { duration: 0.8, opacity: 0, y: 20, stagger: 0.2, ease: "power2.out" });
-  });
-});
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Typewriter & Letter Explosion Demo</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* Basic Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: #111;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    /* First Screen: Typewriter Effect */
+    #first-screen {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .typewriter {
+      font-size: 2.5rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    /* Custom Cursor */
+    #custom-cursor {
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    /* Second Screen: Info Section */
+    #second-screen {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #222;
+      position: relative;
+      padding: 20px;
+      text-align: center;
+    }
+    #infoParagraph {
+      font-size: 1.5rem;
+      max-width: 80%;
+      cursor: pointer;
+    }
+    /* Styling for Article Links (after reassembly) */
+    #infoParagraph p {
+      margin: 10px 0;
+    }
+    #infoParagraph a {
+      color: #00aced;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    #infoParagraph a:hover {
+      color: #1da1f2;
+    }
+  </style>
+</head>
+<body>
+  <!-- First Screen with Typewriter Animation -->
+  <div id="first-screen">
+    <span class="typewriter"></span>
+  </div>
+
+  <!-- Custom Cursor -->
+  <div id="custom-cursor"></div>
+
+  <!-- Second Screen with a Clickable Paragraph -->
+  <div id="second-screen">
+    <p id="infoParagraph">Click here to reveal my articles.</p>
+  </div>
+
+  <!-- External Libraries -->
+  <!-- Typed.js for typewriter effect -->
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.16"></script>
+  <!-- GSAP Core -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <!-- GSAP ScrollTrigger for scroll-based effects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <!-- GSAP SplitText Plugin (assumed available for demo) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/SplitText.min.js"></script>
+
+  <script>
+    /* 1. Playful Typewriter Effect using Typed.js */
+    var typed = new Typed(".typewriter", {
+      strings: ["Student", "Master", "Light"],
+      typeSpeed: 80,      // relatively fast typing
+      backSpeed: 150,     // even faster backspacing
+      backDelay: 500,     // brief pause before deletion
+      startDelay: 300,
+      smartBackspace: false,
+      loop: true,
+      onStringTyped: function(arrayPos, self) {
+        // Introduce an intermittent pause after the second word ("Master")
+        if (arrayPos === 1) {
+          self.stop();
+          setTimeout(function() {
+            self.start();
+          }, 1000); // pause for 1 second
+        }
+      }
+    });
+
+    /* 2. Custom Cursor that follows the mouse */
+    const cursor = document.getElementById("custom-cursor");
+    document.addEventListener("mousemove", function(e) {
+      cursor.style.left = e.clientX + "px";
+      cursor.style.top = e.clientY + "px";
+    });
+
+    /* 3. Transform the Cursor When Reaching Second Screen */
+    gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.create({
+      trigger: "#second-screen",
+      start: "top center",
+      onEnter: () => {
+        gsap.to(cursor, {
+          duration: 0.5,
+          scale: 1.5,
+          rotation: 45,
+          borderRadius: "0%",
+          ease: "power2.out"
+        });
+      },
+      onLeaveBack: () => {
+        gsap.to(cursor, {
+          duration: 0.5,
+          scale: 1,
+          rotation: 0,
+          borderRadius: "50%",
+          ease: "power2.in"
+        });
+      }
+    });
+
+    /* 4. Letter Explosion and Reassembly into Article Links */
+    const infoParagraph = document.getElementById("infoParagraph");
+    infoParagraph.addEventListener("click", function() {
+      // Use GSAP's SplitText to break the paragraph into individual characters.
+      var split = new SplitText(infoParagraph, { type: "chars" });
+      // Animate each character to scatter in random directions.
+      gsap.to(split.chars, {
+        duration: 1,
+        x: () => gsap.utils.random(-200, 200),
+        y: () => gsap.utils.random(-200, 200),
+        rotation: () => gsap.utils.random(-90, 90),
+        opacity: 0,
+        stagger: 0.02,
+        ease: "power3.out"
+      });
+      // After a delay, reassemble new content (article links)
+      gsap.delayedCall(1.5, function() {
+        infoParagraph.innerHTML = `
+          <p><a href="https://www.forbes.com/sites/columbiabusinessschool/2020/10/04/why-investors-should-focus-more-on-the-infrastructure-supporting-the-ai-revolution/" target="_blank">Forbes | Why Investors Should Focus More On The Infrastructure Supporting The AI Revolution | 2020</a></p>
+          <p><a href="https://www.forbes.com/sites/columbiabusinessschool/2020/04/30/ok-boomer-how-aging-population-impact-real-estate-tech/#21fc8cdc3241" target="_blank">Forbes | Ok Boomer: How Aging Population Impact Real Estate Tech | 2020</a></p>
+          <p><a href="https://wire.insiderfinance.io/nfts-like-all-art-are-all-about-narrative-bc0bb5edd81" target="_blank">Insider Finance | NFTs: Like All Art, Are All About Narrative</a></p>
+          <p><a href="https://medium.com/thoughts-from-primary-venture-partners/the-future-of-insurtech-why-serving-policyholders-has-been-the-path-to-growth-for-so-many-320b2c2b76b6" target="_blank">Medium | The Future of Insurtech: Why Serving Policyholders Has Been The Path To Growth For So Many</a></p>
+        `;
+        // Animate in the new paragraphs with a subtle upward fade
+        gsap.from("#infoParagraph p", {
+          duration: 0.8,
+          opacity: 0,
+          y: 20,
+          stagger: 0.2,
+          ease: "power2.out"
+        });
+      });
+    });
+  </script>
+</body>
+</html>
