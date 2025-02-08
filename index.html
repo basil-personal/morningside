@@ -6,6 +6,8 @@
   <title>Basil Alomary</title>
   <!-- Import IBM Plex Sans from Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Include GSAP from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <style>
     /* Global reset and base styling */
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -52,7 +54,7 @@
       transform: translate(-50%, -50%);
       z-index: 2000;
     }
-    /* Explosion overlay (covers full viewport) */
+    /* Explosion overlay covering full viewport */
     #overlay {
       position: fixed;
       top: 0;
@@ -65,7 +67,7 @@
       justify-content: center;
       z-index: 1000;
       pointer-events: none;
-      /* Start with a tiny circle at the click point */
+      /* Start with a tiny circle at click point */
       clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
     }
     #overlay.active {
@@ -75,48 +77,22 @@
       from { clip-path: circle(0% at var(--x, 50%) var(--y, 50%)); }
       to { clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); }
     }
-    /* Overlay content container (for bio text) */
+    /* Bio text container: centered but text left-aligned, very small */
     #overlay-content {
       position: relative;
       max-width: 600px;
       width: 90%;
       margin: 0 auto;
       text-align: left;
-      font-size: 10px; /* very small text */
+      font-size: 10px;
       line-height: 1.4;
-      color: #000;  /* normal text appears in black */
+      color: #000;
+      opacity: 0; /* will be animated in */
     }
-    /* Normal bio text layer (clickable hyperlinks) */
+    /* Normal bio text layer: contains final HTML with working hyperlinks */
     #overlay-normal {
-      position: relative;
-      z-index: 1;
       pointer-events: auto;
     }
-    /* Inverted text layer (for x-ray effect) */
-    #overlay-inverted {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      color: #fff;
-      pointer-events: none;
-      z-index: 2;
-      /* Initially, no area is revealed */
-      clip-path: circle(0px at 0px 0px);
-    }
-    /* Scrambled text layer on top (for scramble effect) */
-    #overlay-scramble {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      color: #000;
-      z-index: 3;
-      pointer-events: none;
-    }
-    /* Ensure hyperlinks in the normal layer work */
     #overlay-normal a {
       color: inherit;
       text-decoration: underline;
@@ -130,118 +106,49 @@
   <!-- Custom pulsing cursor -->
   <div id="custom-cursor"></div>
   
-  <!-- Explosion overlay containing the bio text layers -->
+  <!-- Explosion overlay -->
   <div id="overlay">
     <div id="overlay-content">
-      <!-- Normal (black) bio text with clickable hyperlinks -->
       <div id="overlay-normal"></div>
-      <!-- Inverted (white) bio text for x-ray effect -->
-      <div id="overlay-inverted"></div>
-      <!-- Scrambled text layer (initially scrambled and then unscrambles) -->
-      <div id="overlay-scramble"></div>
     </div>
   </div>
   
   <script>
     /********************
-     * TEXT SCRAMBLE EFFECT CLASS
-     * (Based on https://cruip.com/making-a-text-scramble-animation-with-javascript/)
-     ********************/
-    class TextScramble {
-      constructor(el) {
-        this.el = el;
-        this.chars = '!<>-_\\/[]{}—=+*^?#________';
-        this.update = this.update.bind(this);
-      }
-      setText(newText) {
-        const oldText = this.el.innerText;
-        const length = Math.max(oldText.length, newText.length);
-        const promise = new Promise((resolve) => this.resolve = resolve);
-        this.queue = [];
-        for (let i = 0; i < length; i++) {
-          const from = oldText[i] || '';
-          const to = newText[i] || '';
-          const start = Math.floor(Math.random() * 40);
-          const end = start + Math.floor(Math.random() * 40);
-          this.queue.push({ from, to, start, end });
-        }
-        cancelAnimationFrame(this.frameRequest);
-        this.frame = 0;
-        this.update();
-        return promise;
-      }
-      update() {
-        let output = '';
-        let complete = 0;
-        for (let i = 0; i < this.queue.length; i++) {
-          let { from, to, start, end } = this.queue[i];
-          if (this.frame >= end) {
-            complete++;
-            output += to;
-          } else if (this.frame >= start) {
-            output += this.randomChar();
-          } else {
-            output += from;
-          }
-        }
-        this.el.innerHTML = output;
-        if (complete === this.queue.length) {
-          this.resolve();
-        } else {
-          this.frameRequest = requestAnimationFrame(this.update);
-          this.frame++;
-        }
-      }
-      randomChar() {
-        return this.chars[Math.floor(Math.random() * this.chars.length)];
-      }
-    }
-    
-    /********************
      * GLOBAL VARIABLES & BIO TEXT
      ********************/
-    // Final bio text with working hyperlinks
     const bioHTML = `I'm currently a Principal and the Head of Research &amp; Growth Strategy at <a href="https://stripes.co" target="_blank">Stripes</a>, a NY-based growth equity fund. I lead the team responsible for the diligence and evaluation of Stripes’ investments in consumer and enterprise companies. I also help support our portfolio of #amazing products.<br><br>Prior to Stripes, I spent time as a Consultant at <a href="https://bain.com" target="_blank">Bain</a> and as the VP of Growth at <a href="https://simondata.com" target="_blank">Simon Data</a>. Additionally, I've spent time as an early stage investor and advisor to several companies and funds.`;
     
-    // Plain text version for scramble effect (removes HTML tags)
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = bioHTML;
-    const bioPlain = tempDiv.textContent || tempDiv.innerText;
-    
     /********************
-     * CUSTOM PULSING CURSOR & X-RAY EFFECT
+     * CUSTOM PULSING CURSOR
+     * - Slower pulsing with a 3-second period.
+     * - Dynamic scaling based on distance from center: larger near center, smaller at periphery.
      ********************/
     const cursor = document.getElementById("custom-cursor");
     let cursorX = 0, cursorY = 0;
-    let currentCursorScale = 1;
     let startTime = performance.now();
-    
-    // Animate the pulsing cursor (grows and shrinks)
+    // Define min and max scales based on viewport distance
+    const minScale = 0.5, maxScale = 2.5;
+    const pulsePeriod = 3; // seconds
     function animateCursor() {
       const now = performance.now();
       const elapsed = (now - startTime) / 1000;
-      // Pulse between 1 and 2
-      const pulse = 0.5 * (Math.sin(2 * Math.PI * elapsed) + 1);
-      const scale = 1 + pulse;
-      currentCursorScale = scale;
-      cursor.style.transform = `translate(-50%, -50%) scale(${scale})`;
-      // Update the inverted layer's clip-path (x-ray effect) if overlay is active
-      if (document.getElementById("overlay").style.display !== "none") {
-        updateInvertedClip();
-      }
+      // Determine cursor's distance from center of viewport
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const dx = cursorX - centerX;
+      const dy = cursorY - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const maxDistance = Math.sqrt(Math.pow(centerX,2) + Math.pow(centerY,2));
+      const normalizedDistance = distance / maxDistance; // 0 (center) to 1 (corner)
+      // Base scale: larger when closer to center, smaller when farther
+      const baseScale = minScale + (maxScale - minScale) * (1 - normalizedDistance);
+      // Slow pulsing factor (sine wave with period = pulsePeriod)
+      const pulse = 0.5 * (Math.sin((2 * Math.PI / pulsePeriod) * elapsed) + 1); // 0 to 1
+      // Final scale: modulate base scale by pulse (amplitude factor set to 0.3)
+      const finalScale = baseScale * (1 + 0.3 * pulse);
+      cursor.style.transform = `translate(-50%, -50%) scale(${finalScale})`;
       requestAnimationFrame(animateCursor);
-    }
-    
-    // Update clip-path on inverted layer so that a circle (centered on the cursor) reveals white text
-    function updateInvertedClip() {
-      const invertedLayer = document.getElementById("overlay-inverted");
-      const content = document.getElementById("overlay-content");
-      const rect = content.getBoundingClientRect();
-      const relativeX = cursorX - rect.left;
-      const relativeY = cursorY - rect.top;
-      // Base radius (10px) scaled by current cursor scale and multiplied by a factor (adjust as needed)
-      const effectiveRadius = (10 * currentCursorScale) * 1.5;
-      invertedLayer.style.clipPath = `circle(${effectiveRadius}px at ${relativeX}px ${relativeY}px)`;
     }
     
     // Update cursor position on mouse and touch events
@@ -257,11 +164,10 @@
       cursor.style.left = e.touches[0].clientX + "px";
       cursor.style.top  = e.touches[0].clientY + "px";
     });
-    
     animateCursor();
     
     /********************
-     * EXPLOSION & REVEAL WITH SCRAMBLE EFFECT
+     * EXPLOSION & BIO DROP-IN ANIMATION
      ********************/
     const textEl = document.getElementById("text");
     textEl.addEventListener("click", triggerExplosion);
@@ -286,23 +192,21 @@
       overlay.style.setProperty("--x", clientX + "px");
       overlay.style.setProperty("--y", clientY + "px");
       overlay.style.display = "flex";
-      void overlay.offsetWidth; // force reflow to restart animation
+      void overlay.offsetWidth; // trigger reflow
       overlay.classList.add("active");
       
-      // Change the custom cursor to black (solid, no outline)
+      // Change cursor to black immediately (solid, no outline)
       cursor.style.background = "#000";
       
-      // Populate the normal and inverted layers with the final bio text
-      document.getElementById("overlay-normal").innerHTML = bioHTML;
-      document.getElementById("overlay-inverted").innerHTML = bioHTML;
+      // Populate the bio text into the overlay
+      const overlayNormal = document.getElementById("overlay-normal");
+      overlayNormal.innerHTML = bioHTML;
       
-      // Use the TextScramble class to scramble and then unscramble the bio (using plain text)
-      const scrambleEl = document.getElementById("overlay-scramble");
-      const fx = new TextScramble(scrambleEl);
-      fx.setText(bioPlain).then(() => {
-        // Once unscrambled, remove the scramble layer so the clickable normal layer is accessible
-        scrambleEl.style.display = "none";
-      });
+      // Animate the drop-in of the bio text from above the viewport
+      const overlayContent = document.getElementById("overlay-content");
+      gsap.fromTo(overlayContent, 
+                    { y: "-100vh", opacity: 0 },
+                    { y: "0", opacity: 1, duration: 1, ease: "power2.out", delay: 0.5 });
     }
   </script>
 </body>
