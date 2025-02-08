@@ -7,7 +7,7 @@
   <!-- Import IBM Plex Sans from Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* Global Reset & Base Styles */
+    /* Global reset and base styling */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       width: 100%;
@@ -16,7 +16,7 @@
       overflow: hidden;
       font-family: 'IBM Plex Sans', sans-serif;
     }
-    /* Main "BASIL ALOMARY" Text */
+    /* Main "BASIL ALOMARY" text */
     #text {
       position: absolute;
       top: 50%;
@@ -38,20 +38,21 @@
     @keyframes vanish {
       to { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
     }
-    /* Custom Pulsing Cursor (initially white, but will turn black after explosion) */
+    /* Custom pulsing cursor */
     #custom-cursor {
       position: fixed;
       top: 0;
       left: 0;
       width: 20px;
       height: 20px;
-      background: #fff;
+      background: #fff; /* initially white */
       border-radius: 50%;
       pointer-events: none;
       transform: translate(-50%, -50%);
       z-index: 2000;
+      /* No outline, just a solid circle */
     }
-    /* Explosion Overlay */
+    /* Overlay container (covers full viewport) */
     #overlay {
       position: fixed;
       top: 0;
@@ -59,12 +60,11 @@
       width: 100%;
       height: 100%;
       background: #fff;
-      display: none; /* Initially hidden */
+      display: none; /* will be shown on explosion */
       align-items: center;
       justify-content: center;
       z-index: 1000;
       pointer-events: none;
-      /* Explosion effect starts as a tiny circle */
       clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
     }
     #overlay.active {
@@ -74,33 +74,50 @@
       from { clip-path: circle(0% at var(--x, 50%) var(--y, 50%)); }
       to { clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); }
     }
-    /* Overlay Content Container */
+    /* Bio text container – centered, but text inside is left-aligned and very small */
     #overlay-content {
       position: relative;
       max-width: 600px;
+      width: 90%;
       margin: 0 auto;
       text-align: left;
-      font-size: 12px; /* Much smaller text */
+      font-size: 10px;
       line-height: 1.4;
+      color: #000; /* final normal text color */
     }
-    /* The normal (bottom) text layer: black text */
+    /* Normal (unscrambled) layer: clickable with final HTML (links) */
     #overlay-normal {
-      color: #000;
+      position: relative;
+      z-index: 1;
+      pointer-events: auto;
     }
-    /* The inverted (top) text layer: white text, masked by a clip-path */
+    /* Inverted white text layer for x-ray effect */
     #overlay-inverted {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      pointer-events: none;
       color: #fff;
-      /* Start with an empty clip-path (no area revealed) */
+      pointer-events: none;
+      z-index: 2;
+      /* Initially hide by clip-path */
       clip-path: circle(0px at 0px 0px);
     }
-    /* Ensure links inside bio work normally */
-    #overlay-normal a, #overlay-inverted a {
+    /* Scrambled text layer on top, fades out to reveal underlying layers */
+    #overlay-scramble {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      color: #000;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 1;
+    }
+    /* Ensure hyperlinks in the normal layer are clickable and styled */
+    #overlay-normal a {
       color: inherit;
       text-decoration: underline;
     }
@@ -110,14 +127,18 @@
   <!-- Main Text -->
   <div id="text">BASIL ALOMARY</div>
   
-  <!-- Custom Cursor -->
+  <!-- Custom Pulsing Cursor -->
   <div id="custom-cursor"></div>
   
   <!-- Explosion Overlay -->
   <div id="overlay">
     <div id="overlay-content">
+      <!-- Normal layer with final bio text -->
       <div id="overlay-normal"></div>
+      <!-- Inverted (white) text layer for x-ray effect -->
       <div id="overlay-inverted"></div>
+      <!-- Scrambled text layer on top -->
+      <div id="overlay-scramble"></div>
     </div>
   </div>
   
@@ -125,53 +146,66 @@
     /********************
      * Global Variables & Bio Text
      ********************/
-    const bioText = `I'm currently a Principal and the Head of Research &amp; Growth Strategy at <a href="https://stripes.co" target="_blank">Stripes</a>, a NY-based growth equity fund. I lead the team responsible for the diligence and evaluation of Stripes’ investments in consumer and enterprise companies. I also help support our portfolio of #amazing products.<br><br>Prior to Stripes, I spent time as a Consultant at <a href="https://www.bain.com" target="_blank">Bain &amp; Company</a> and as the VP of Growth at <a href="https://www.simondata.com" target="_blank">Simon Data</a>. Additionally, I've spent time as an early stage investor and advisor to several companies and funds.`;
+    const bioHTML = `I'm currently a Principal and the Head of Research &amp; Growth Strategy at <a href="https://stripes.co" target="_blank">Stripes</a>, a NY-based growth equity fund. I lead the team responsible for the diligence and evaluation of Stripes’ investments in consumer and enterprise companies. I also help support our portfolio of #amazing products.<br><br>Prior to Stripes, I spent time as a Consultant at <a href="https://bain.com" target="_blank">Bain</a> and as the VP of Growth at <a href="https://simondata.com" target="_blank">Simon Data</a>. Additionally, I've spent time as an early stage investor and advisor to several companies and funds.`;
     
-    // We'll store the current cursor scale so we know the effective radius.
-    let currentCursorScale = 1;
-    // We'll track the cursor's position in viewport coordinates.
-    let cursorX = 0, cursorY = 0;
+    // We'll also get a plain text version for scrambling
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = bioHTML;
+    const bioPlain = tempDiv.textContent || tempDiv.innerText;
+    
+    // Utility: Generate scrambled version of a string (preserving spaces and punctuation)
+    function scrambleText(text) {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      let scrambled = "";
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (c.match(/[A-Za-z0-9]/)) {
+          scrambled += chars[Math.floor(Math.random() * chars.length)];
+        } else {
+          scrambled += c;
+        }
+      }
+      return scrambled;
+    }
     
     /********************
-     * Custom Cursor Animation (Big, Growing, Pulsing)
-     * Using a sine wave for constant pulsing.
+     * Custom Pulsing Cursor Animation
      ********************/
     const cursor = document.getElementById("custom-cursor");
-    // Turn the cursor black after explosion is triggered.
+    let cursorX = 0, cursorY = 0;
+    let currentCursorScale = 1;
     let cursorIsBlack = false;
     let startTime = performance.now();
     
     function animateCursor() {
       const now = performance.now();
-      const elapsed = (now - startTime) / 1000; // in seconds
-      // Pulse between 1 and 2 (scale factor)
-      const pulse = 0.5 * (Math.sin(2 * Math.PI * elapsed) + 1); // ranges 0..1
-      const scale = 1 + pulse;  // scale ranges 1 to 2
+      const elapsed = (now - startTime) / 1000;
+      // Pulsing: scale between 1 and 2
+      const pulse = 0.5 * (Math.sin(2 * Math.PI * elapsed) + 1);
+      const scale = 1 + pulse;
       currentCursorScale = scale;
       cursor.style.transform = `translate(-50%, -50%) scale(${scale})`;
       
-      // If overlay is active, update the clip-path on the inverted text layer.
+      // If overlay is active, update the inverted layer's clip-path
       if (document.getElementById("overlay").style.display !== "none") {
         updateInvertedClip();
       }
       requestAnimationFrame(animateCursor);
     }
     
-    // Update the clip-path of the inverted text layer so that it shows a circle 
-    // (centered at the cursor's position relative to the overlay-content).
+    // Update the clip-path on the inverted layer (to reveal white text where the cursor is)
     function updateInvertedClip() {
       const invertedLayer = document.getElementById("overlay-inverted");
       const content = document.getElementById("overlay-content");
       const rect = content.getBoundingClientRect();
-      // Compute cursor position relative to overlay-content.
       const relativeX = cursorX - rect.left;
       const relativeY = cursorY - rect.top;
-      // Determine the effective radius of the cursor (base 20px, half width, times scale, times factor).
-      const effectiveRadius = (20 * currentCursorScale / 2) * 1.5; // adjust factor as desired
+      // Effective radius: base (10px) * current scale * factor
+      const effectiveRadius = (10 * currentCursorScale) * 1.5;
       invertedLayer.style.clipPath = `circle(${effectiveRadius}px at ${relativeX}px ${relativeY}px)`;
     }
     
-    // Update cursor position on mouse/touch move.
+    // Update cursor position on mouse/touch events
     document.addEventListener("mousemove", e => {
       cursorX = e.clientX;
       cursorY = e.clientY;
@@ -188,18 +222,17 @@
     animateCursor();
     
     /********************
-     * Explosion & Reveal Animation on Click/Touch
+     * Explosion & Reveal with Scramble Effect
      ********************/
     const textEl = document.getElementById("text");
     textEl.addEventListener("click", triggerExplosion);
     textEl.addEventListener("touchstart", triggerExplosion);
     
     function triggerExplosion(e) {
-      // Prevent multiple triggers.
       if (textEl.classList.contains("clicked")) return;
       textEl.classList.add("clicked");
       
-      // Get the click/touch coordinates.
+      // Get click/touch coordinates
       let clientX, clientY;
       if (e.type.startsWith("touch")) {
         clientX = e.touches[0].clientX;
@@ -209,22 +242,33 @@
         clientY = e.clientY;
       }
       
-      // Activate the explosion overlay.
+      // Activate explosion overlay
       const overlay = document.getElementById("overlay");
       overlay.style.setProperty("--x", clientX + "px");
       overlay.style.setProperty("--y", clientY + "px");
       overlay.style.display = "flex";
-      // Restart explosion animation.
-      void overlay.offsetWidth;
+      void overlay.offsetWidth; // trigger reflow
       overlay.classList.add("active");
       
-      // Change the custom cursor to black.
+      // Change cursor to black (solid, no outline)
       cursor.style.background = "#000";
       cursorIsBlack = true;
       
-      // Set the bio text immediately (no scramble effect) in both layers.
-      document.getElementById("overlay-normal").innerHTML = bioText;
-      document.getElementById("overlay-inverted").innerHTML = bioText;
+      // Populate the normal and inverted layers with the final bio HTML
+      document.getElementById("overlay-normal").innerHTML = bioHTML;
+      document.getElementById("overlay-inverted").innerHTML = bioHTML;
+      
+      // Generate a scrambled version from the plain text and set it in the scramble layer
+      const scrambled = scrambleText(bioPlain);
+      document.getElementById("overlay-scramble").innerHTML = scrambled;
+      
+      // After a short delay, fade out the scramble layer to reveal the unscrambled text
+      setTimeout(() => {
+        // Use CSS transition for opacity (or GSAP if preferred)
+        const scrambleLayer = document.getElementById("overlay-scramble");
+        scrambleLayer.style.transition = "opacity 2s ease";
+        scrambleLayer.style.opacity = "0";
+      }, 500);
     }
   </script>
 </body>
